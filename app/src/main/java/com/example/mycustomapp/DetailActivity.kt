@@ -41,7 +41,7 @@ class DetailActivity : AppCompatActivity() {
         movieReference = database.getReference("Reviews")
 
         val heartImg = findViewById<ImageView>(R.id.save)
-        //Set a click listener when save is pressed
+        // Set a click listener when the save button is pressed
         heartImg.setOnClickListener {
             // Inflate the dialog layout
             val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_rate_review, null)
@@ -69,15 +69,11 @@ class DetailActivity : AppCompatActivity() {
                 } else {
                     // Check if the movie object is not null
                     movie?.let { movie ->
-                        // Create a new review object
-                        val newReview = movie.title?.let { it1 ->
-                            WatchlistItem("",it1, rating, review, movie.poster)
-                        }
                         // Save the review to Firebase with a push key
                         val reviewKey = movieReference.push().key
                         // Save the review to Firebase
                         reviewKey?.let { key ->
-                            newReview?.key = key
+                            val newReview = WatchlistItem(key, movie.title ?: "", rating, review, movie.poster)
                             movieReference.child(key).setValue(newReview)
                             alertDialog.dismiss()
 
@@ -86,10 +82,8 @@ class DetailActivity : AppCompatActivity() {
                         }
                     }
                 }
-                // Dismiss the dialog
-                alertDialog.dismiss()
             }
-            cancelButton.setOnClickListener{
+            cancelButton.setOnClickListener {
                 // Dismiss the dialog
                 alertDialog.dismiss()
             }
@@ -114,7 +108,6 @@ class DetailActivity : AppCompatActivity() {
             movieDateTxt.text = movie.date
             movieDetail.text = movie.detail
             numbers.text = movie.numbers
-
 
             // Load the movie poster image using Glide
             val IMAGE_BASE = "https://image.tmdb.org/t/p/w500/"

@@ -48,6 +48,7 @@ class WatchedAdapter(
         fun onDeleteItemClick(watchlistItem: WatchlistItem)
     }
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WatchlistViewHolder {
         // Inflate the layout for an individual watched item
         val binding = WatchedItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)

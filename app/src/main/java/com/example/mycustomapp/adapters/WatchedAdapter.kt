@@ -11,13 +11,15 @@ import com.bumptech.glide.Glide
 class WatchedAdapter(
     private val watchlist: List<WatchlistItem>,
     private val itemClickListener: OnItemClickListener,
-    private val deleteItemClickListener: OnDeleteItemClickListener
+    private val deleteItemClickListener: OnDeleteItemClickListener,
+    private val editItemClickListener: OnEditItemClickListener
 ) : RecyclerView.Adapter<WatchedAdapter.WatchlistViewHolder>() {
 
     // ViewHolder class for individual watched items
     class WatchlistViewHolder(
         private val binding: WatchedItemBinding,
-        private val deleteItemClickListener: OnDeleteItemClickListener
+        private val deleteItemClickListener: OnDeleteItemClickListener,
+        private val editItemClickListener: OnEditItemClickListener
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private val IMAGE_BASE = "https://image.tmdb.org/t/p/w500/"
@@ -35,6 +37,12 @@ class WatchedAdapter(
             deleteButton.setOnClickListener {
                 deleteItemClickListener.onDeleteItemClick(watchlistItem)
             }
+
+            val editButton: Button = binding.editButton
+            // Set a click listener on the edit button to handle item editing
+            editButton.setOnClickListener {
+                editItemClickListener.onEditItemClick(watchlistItem)
+            }
         }
     }
 
@@ -48,18 +56,19 @@ class WatchedAdapter(
         fun onDeleteItemClick(watchlistItem: WatchlistItem)
     }
 
+    interface OnEditItemClickListener {
+        fun onEditItemClick(watchlistItem: WatchlistItem)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WatchlistViewHolder {
         // Inflate the layout for an individual watched item
         val binding = WatchedItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return WatchlistViewHolder(binding, deleteItemClickListener)
+        return WatchlistViewHolder(binding, deleteItemClickListener, editItemClickListener)
     }
 
     override fun getItemCount(): Int = watchlist.size
 
     override fun onBindViewHolder(holder: WatchlistViewHolder, position: Int) {
-
-
         // Bind data to the ViewHolder
         holder.bindWatchlistItem(watchlist[position])
 

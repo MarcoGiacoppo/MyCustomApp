@@ -67,6 +67,7 @@ class DetailActivity : AppCompatActivity() {
                 if (rating == 0f || review.isEmpty()) {
                     Toast.makeText(this, "Please enter both rating and review.", Toast.LENGTH_SHORT).show()
                 } else {
+                    Toast.makeText(this, "Saved to watched list.", Toast.LENGTH_SHORT).show()
                     // Check if the movie object is not null
                     movie?.let { movie ->
                         // Save the review to Firebase with a push key

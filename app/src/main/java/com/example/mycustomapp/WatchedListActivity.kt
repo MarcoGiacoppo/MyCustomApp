@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.RatingBar
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -121,13 +122,41 @@ class WatchedListActivity : AppCompatActivity(),
                     itemReference.child("userReview").setValue(newReview)
 
                     dialog.dismiss()
+
+                    // Show toast if success
+                    Toast.makeText(this@WatchedListActivity, "Data edited successfully", Toast.LENGTH_SHORT).show()
                 }
                 .setNegativeButton("Cancel") { dialog, _ ->
                     dialog.dismiss()
                 }
                 .create()
 
-            editDialog.show()
+            // Fetch the saved data
+            itemReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        val userRating =
+                            dataSnapshot.child("userRating").getValue(Float::class.java)
+                        val userReview =
+                            dataSnapshot.child("userReview").getValue(String::class.java)
+
+                        // Pre-fill the dialog fields with existing data
+                        val newRatingBar =
+                            editDialogView.findViewById<RatingBar>(R.id.editMovieRatingBar)
+                        val newReviewEditText =
+                            editDialogView.findViewById<EditText>(R.id.editMovieReview)
+
+                        newRatingBar.rating = userRating ?: 0f
+                        newReviewEditText.setText(userReview ?: "")
+
+                        editDialog.show()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(this@WatchedListActivity, "Database error: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
     }
-}
+    }

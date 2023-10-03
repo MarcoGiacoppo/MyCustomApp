@@ -56,6 +56,7 @@ class WatchedAdapter(
         fun onDeleteItemClick(watchlistItem: WatchlistItem)
     }
 
+    // Interface for edit item click events
     interface OnEditItemClickListener {
         fun onEditItemClick(watchlistItem: WatchlistItem)
     }

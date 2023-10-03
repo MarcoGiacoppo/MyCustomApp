@@ -38,7 +38,6 @@ data class WatchlistItem(
     val userReview: String,
     val posterUrl: String?
 ) {
-    // Default, no-argument constructor required by Firebase
     constructor() : this(null, "", 0.0f, "", "")
 }
 

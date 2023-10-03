@@ -19,7 +19,7 @@ import com.google.firebase.database.*
 
 class WatchedListActivity : AppCompatActivity(),
     WatchedAdapter.OnDeleteItemClickListener,
-    WatchedAdapter.OnEditItemClickListener { // Implement the OnEditItemClickListener interface
+    WatchedAdapter.OnEditItemClickListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: WatchedAdapter
@@ -35,7 +35,7 @@ class WatchedListActivity : AppCompatActivity(),
         // Show the progress bar
         loadingProgressBar.visibility = View.VISIBLE
 
-        // Initialize your RecyclerView
+        // Initialize the RecyclerView
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -48,11 +48,10 @@ class WatchedListActivity : AppCompatActivity(),
         // Create a default item click listener
         val itemClickListener = object : WatchedAdapter.OnItemClickListener {
             override fun onItemClick(watchlistItem: WatchlistItem) {
-                // Handle item click if needed
             }
         }
 
-        // Initialize your adapter with the correct interfaces
+        // Initialize the adapter
         adapter = WatchedAdapter(reviewList, itemClickListener, this, this)
 
         val backBtn = findViewById<ImageView>(R.id.back)
@@ -77,12 +76,11 @@ class WatchedListActivity : AppCompatActivity(),
                         loadingProgressBar.visibility = View.GONE
                     }
                 }
-                // Set the adapter for your RecyclerView
+                // Set the adapter for the RecyclerView
                 recyclerView.adapter = adapter
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Handle onCancelled if needed
             }
         }
 
@@ -98,6 +96,7 @@ class WatchedListActivity : AppCompatActivity(),
         }
     }
 
+    // Function for edit item
     override fun onEditItemClick(watchlistItem: WatchlistItem) {
         val watchlistItemKey = watchlistItem.key
 
@@ -108,7 +107,7 @@ class WatchedListActivity : AppCompatActivity(),
             val editDialogView = LayoutInflater.from(this).inflate(R.layout.edit_dialog, null)
             val editDialog = AlertDialog.Builder(this)
                 .setTitle("Edit Item")
-                .setView(editDialogView) // Create an XML layout for editing
+                .setView(editDialogView)
                 .setPositiveButton("Save") { dialog, _ ->
                     val newRatingBar = editDialogView.findViewById<RatingBar>(R.id.editMovieRatingBar)
                     val newReviewEditText = editDialogView.findViewById<EditText>(R.id.editMovieReview)

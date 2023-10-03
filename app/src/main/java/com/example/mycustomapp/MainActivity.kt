@@ -1,6 +1,5 @@
 package com.example.mycustomapp
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -77,7 +76,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
                     loadingProgressBar.visibility = View.GONE
                     rvMoviesList.visibility = View.VISIBLE
                 } else {
-                    // Handle HTTP error here, e.g., show a toast message
+                    // Handle HTTP error
                     Toast.makeText(this@MainActivity, "Failed to fetch data", Toast.LENGTH_SHORT).show()
                     // Hide the loading indicator in case of an error
                     loadingProgressBar.visibility = View.GONE
@@ -85,7 +84,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
             }
 
             override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                // Handle network or other failures here, e.g., show a toast message or log the error
+                // Handle network or other failures
                 Toast.makeText(this@MainActivity, "Network error", Toast.LENGTH_SHORT).show()
             }
         })

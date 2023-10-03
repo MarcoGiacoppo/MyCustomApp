@@ -47,7 +47,7 @@ class RegisterActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         val intent = Intent(this, LoginActivity::class.java)
                         startActivity(intent)
-                        finish() // Finish this activity to prevent the user from going back
+                        finish()
                     } else {
                         Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }

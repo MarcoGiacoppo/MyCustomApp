@@ -16,6 +16,7 @@ import com.example.mycustomapp.models.Movie
 import com.example.mycustomapp.models.WatchlistItem
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.auth.FirebaseAuth
 
 
 class DetailActivity : AppCompatActivity() {
@@ -70,16 +71,22 @@ class DetailActivity : AppCompatActivity() {
                     Toast.makeText(this, "Saved to watched list.", Toast.LENGTH_SHORT).show()
                     // Check if the movie object is not null
                     movie?.let { movie ->
+                        // Get the currently authenticated user
+                        val user = FirebaseAuth.getInstance().currentUser // Get the user
+                        if (user!= null) {
+                            val userId = user.uid
+
                         // Save the review to Firebase with a push key
                         val reviewKey = movieReference.push().key
                         // Save the review to Firebase
                         reviewKey?.let { key ->
-                            val newReview = WatchlistItem(key, movie.title ?: "", rating, review, movie.poster)
+                            val newReview = WatchlistItem(key, userId, movie.title ?: "", rating, review, movie.poster)
                             movieReference.child(key).setValue(newReview)
                             alertDialog.dismiss()
 
                             val intent = Intent(this, WatchedListActivity::class.java)
                             startActivity(intent)
+                        }
                         }
                     }
                 }

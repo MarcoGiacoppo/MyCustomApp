@@ -33,12 +33,13 @@ data class Movie(
 
 data class WatchlistItem(
     var key: String?, // Field to store the Firebase-generated key
+    var userId: String?,
     val movieTitle: String,
     val userRating: Float,
     val userReview: String,
     val posterUrl: String?
 ) {
-    constructor() : this(null, "", 0.0f, "", "")
+    constructor() : this(null, null, "", 0.0f, "", "")
 }
 
 

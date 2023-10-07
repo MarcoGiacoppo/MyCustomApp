@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mycustomapp.adapters.WatchedAdapter
 import com.example.mycustomapp.databinding.ActivityWatchedListBinding
 import com.example.mycustomapp.models.WatchlistItem
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class WatchedListActivity : AppCompatActivity(),
@@ -67,18 +68,24 @@ class WatchedListActivity : AppCompatActivity(),
                 // Clear the previous list
                 reviewList.clear()
 
-                for (postSnapshot in dataSnapshot.children) {
-                    // Deserialize the data into a WatchlistItem object
-                    val watchlistItem = postSnapshot.getValue(WatchlistItem::class.java)
+                // Get the currently authenticated user
+                val user = FirebaseAuth.getInstance().currentUser
+                if (user != null) {
+                    val userId = user.uid
 
-                    if (watchlistItem != null) {
-                        reviewList.add(watchlistItem)
-                        // Hide the loading indicator once the data has been loaded
-                        loadingProgressBar.visibility = View.GONE
+                    for (postSnapshot in dataSnapshot.children) {
+                        // Deserialize the data into a WatchlistItem object
+                        val watchlistItem = postSnapshot.getValue(WatchlistItem::class.java)
+
+                        if (watchlistItem != null && watchlistItem.userId == userId) {
+                            reviewList.add(watchlistItem)
+                            // Hide the loading indicator once the data has been loaded
+                            loadingProgressBar.visibility = View.GONE
+                        }
                     }
+                    // Set the adapter for the RecyclerView
+                    recyclerView.adapter = adapter
                 }
-                // Set the adapter for the RecyclerView
-                recyclerView.adapter = adapter
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

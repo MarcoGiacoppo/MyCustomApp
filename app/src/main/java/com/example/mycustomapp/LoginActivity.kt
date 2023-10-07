@@ -9,16 +9,21 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import android.graphics.Paint
+import android.media.MediaPlayer
 
 private lateinit var auth: FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
+    private lateinit var mediaPlayer: MediaPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
         // Initialize Firebase Authentication
         auth = FirebaseAuth.getInstance()
+
+        // Initialize MediaPlayer for audio playback
+        mediaPlayer = MediaPlayer.create(this, R.raw.intro)
 
         // Set a click listener on the Login button
         val login = findViewById<Button>(R.id.loginBtn)
@@ -38,12 +43,12 @@ class LoginActivity : AppCompatActivity() {
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
                             // If successful, navigate to MainActivity
+                            mediaPlayer.start()
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                         } else {
                             //Login failed, handle error
-                            Toast.makeText(this, "Wrong Username or Password.", Toast.LENGTH_SHORT)
-                                .show()
+                            Toast.makeText(this, "Wrong Username or Password.", Toast.LENGTH_SHORT).show()
                         }
                     }
             }
@@ -80,5 +85,10 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
     }
 }

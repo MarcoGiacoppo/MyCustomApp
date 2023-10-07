@@ -32,12 +32,11 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_marginLeft="10dp"
-                    android:background="@drawable/bg_circle_dark"
                     android:padding="5dp"
                     app:layout_constraintBottom_toBottomOf="@+id/mainTitle"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/mainTitle"
-                    app:srcCompat="@drawable/ic_round_arrow_back_24"
+                    app:srcCompat="@drawable/signout"
                     app:tint="@color/white" />
 
                 <TextView

@@ -17,6 +17,7 @@ import com.example.mycustomapp.services.MovieApiInterface
 import com.example.mycustomapp.services.MovieApiInterface2
 import com.example.mycustomapp.services.MovieApiInterface3
 import com.example.mycustomapp.services.MovieApiService
+import com.google.firebase.auth.FirebaseAuth
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -40,8 +41,8 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
         // Back button
         val backButton = findViewById<ImageView>(R.id.backBtn)
         backButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            Toast.makeText(this, "Hope to see you soon again!", Toast.LENGTH_SHORT).show()
+            logoutUser()
         }
 
         // Watchlist button
@@ -138,5 +139,15 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
                 Toast.makeText(this@MainActivity, "Network error (page 1)", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+    // After users presses on the sign out button, they won't be able to edit data
+    private fun logoutUser() {
+        // Sign out the user using Firebase Authentication
+        FirebaseAuth.getInstance().signOut()
+
+        // After logging out, navigate to the login screen
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

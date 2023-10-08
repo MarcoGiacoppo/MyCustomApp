@@ -6,8 +6,6 @@ This app provides information about various movies, including details, ratings, 
 ## Table of Contents
 - [Overview](#overview)
 - [Features](#features)
-- [Getting Started](#getting-started)
-- [Usage](#usage)
 - [Acknowledgements](#acknowledgements)
 
 ## Overview
@@ -16,37 +14,24 @@ It offers a user-friendly interface and access to a vast database of movie infor
 
 ## Features
 - Search and explore a wide range of movies.
-- View detailed information about each movie, including ratings, release date, and a brief description.
+- View detailed information about each movie, including ratings, a release date, and a brief description.
 - Watch trailers for movies (availability may vary).
 - Rate and review movies.
 - Save movies to a watchlist.
 
-## Getting Started
-To get started with Cinérate, follow these steps:
-### Prerequisites
-Before you begin, ensure you have the following tools installed:
-- Android Studio
-- Git
-### Instalation
-1. Clone the repository to your local machine:
-```shell
-git clone https://github.com/marcogiacoppo/mycustomapp.git
-```
-2. Open the project in Android Studio.
-
-3. Build and run the app on your Android device or emulator.
-
 ## Usage
 Cinérate is simple to use:
-1. Home Screen: Upon opening the app, you'll land on the home screen. Here, you can browse and search for movies.
+1. Intro Screen: Upon opening the app, you'll land on the intro screen. Here, you can press the Get Started button, and you'll be redirected to the login screen. If you have an account, you can login right away. Or, you can also register an account.
 
-2. Movie Details: Click on a movie card to view more details about that movie, including its rating, release date, and a brief description.
+2. Home Screen: When you've logged in successfully, you'll land on the home screen. Here, you can browse and search for movies to rate and review.
 
-3. Watch Trailer: If a trailer is available, you can click on the "Watch Trailer" text to watch the movie's trailer on YouTube.
+3. Movie Details: Click on a movie card to view more details about that movie, including its rating, release date, and a brief description. 
 
-4. Rate and Review: To rate and review a movie, click the heart icon on the top right of the movie details screen. You can then provide a rating and write a review.
+4. Watch Trailer: If a trailer is available, you can click on the "Watch Trailer" text to watch the movie's trailer on YouTube.
 
-5. Watchedlist: To save a movie to your watchedlist, click the save button on the rate and review dialog. Or you can access the watchedlist from the home screen.
+5. Rate and Review: To rate and review a movie, click the heart icon on the top right of the movie details screen. You can then provide a rating and write a review.
+
+6. Watchedlist: To save a movie to your watchedlist, click the save button on the rate and review dialog. Or you can access the watchedlist from the home screen. Here, you can also edit and delete the rating and review.
 
 ## Acknowledgements
 I'd like to thank the creators of the following libraries and APIs that made this app possible:
@@ -56,4 +41,4 @@ I'd like to thank the creators of the following libraries and APIs that made thi
 - [Firebase](https://firebase.google.com/) 
 - [Material Design Icons](https://material.io/resources/icons/)
 
-Happy movie browsing !
+Happy movie browsing!

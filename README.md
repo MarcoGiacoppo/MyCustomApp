@@ -6,6 +6,7 @@ This app provides information about various movies, including details, ratings, 
 ## Table of Contents
 - [Overview](#overview)
 - [Features](#features)
+- [Usage](#usage)
 - [Acknowledgements](#acknowledgements)
 
 ## Overview

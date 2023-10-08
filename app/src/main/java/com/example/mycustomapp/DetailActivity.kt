@@ -135,7 +135,7 @@ class DetailActivity : AppCompatActivity() {
     }
     private fun fetchYouTubeKey(movieId: Int) {
         val apiKey = "381e5879afdcdcba913bc1f839a6f004"
-        // Create the URL for fetching video information from TMDB using the movieId
+        // Create the URL for fetching video information from TMDb using the movieId
         val url = "https://api.themoviedb.org/3/movie/$movieId/videos?api_key=$apiKey"
 
         // Create an HTTP request to fetch the video data

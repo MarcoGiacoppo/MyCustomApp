@@ -52,8 +52,8 @@ Cinérate is simple to use:
 I'd like to thank the creators of the following libraries and APIs that made this app possible:
 - [The Movie Database (TMDb)](https://www.themoviedb.org/)
 - [Glide](https://github.com/bumptech/glide)
-- [OpenAI](https://openai.com/)
-- [Firebase](https://firebase.google.com/)
+- [OpenAI](https://openai.com/) 
+- [Firebase](https://firebase.google.com/) 
 - [Material Design Icons](https://material.io/resources/icons/)
 
 Happy movie browsing !

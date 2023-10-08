@@ -8,9 +8,7 @@ This app provides information about various movies, including details, ratings, 
 - [Features](#features)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
-- [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ## Overview
 Cinérate is designed to make it easy for users to find and learn about their favorite movies.

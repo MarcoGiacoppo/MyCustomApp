@@ -13,10 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyCustomApp"
         tools:targetApi="31">
+
         <activity
             android:name=".WatchedListActivity"
             android:exported="false"
-            android:theme="@style/NoActionBarAndStatusBar"/>
+            android:theme="@style/NoActionBarAndStatusBar" />
         <activity
             android:name=".DetailActivity"
             android:exported="false"

@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Movie(
     @SerializedName("id")
-    val id : String?, // Movie ID
+    val id : Int?, // Movie ID
 
     @SerializedName("title")
     val title : String?, // Movie Title
@@ -28,7 +28,7 @@ data class Movie(
     val numbers : String? // Vote Count
 
 ) : Parcelable{
-    constructor() : this("","","","","","","")
+    constructor() : this(null,"","","","","","")
 }
 
 data class WatchlistItem(

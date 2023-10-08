@@ -59,6 +59,8 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
 
         // Pass the selected movie's details to the DetailActivity
         intent.putExtra("movie", movie)
+        // Pass the movie_id to be put inside another api and watch trailer
+        intent.putExtra("movie_id", movie.id)
 
         // Start the detail activity
         startActivity(intent)
@@ -69,6 +71,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
         val apiService2 = MovieApiService.getInstance().create(MovieApiInterface2::class.java)
         val apiService3 = MovieApiService.getInstance().create(MovieApiInterface3::class.java)
         val loadingProgressBar = findViewById<ProgressBar>(R.id.loading1)
+
 
         // Show the progress bar
         loadingProgressBar.visibility = View.VISIBLE

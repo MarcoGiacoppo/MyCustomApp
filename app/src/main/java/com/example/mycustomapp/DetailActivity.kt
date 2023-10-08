@@ -1,9 +1,13 @@
 package com.example.mycustomapp
 
 import android.content.Intent
+import android.graphics.Paint
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -17,6 +21,9 @@ import com.example.mycustomapp.models.WatchlistItem
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.auth.FirebaseAuth
+import okhttp3.*
+import org.json.JSONObject
+import java.io.IOException
 
 
 class DetailActivity : AppCompatActivity() {
@@ -29,12 +36,40 @@ class DetailActivity : AppCompatActivity() {
 
         // Retrieve the movie details from the Intent extras
         val movie = intent.getParcelableExtra<Movie>("movie")
+        // Retrieve the movie_id for each movie users clicked
+        val movieId = intent.getIntExtra("movie_id", 0)
+
+        // Used log to check if its passing the right id, turns out i passed a string instead of int,
+        // that's why the watch trailer isn't working
+        // Log.i("movie_id", "Movie id: $movieId")
+
         populateUI(movie)
 
         val backButton = findViewById<ImageView>(R.id.back)
         backButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+        }
+
+        val watchTrailer = findViewById<TextView>(R.id.trailer)
+        watchTrailer.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+        watchTrailer.isEnabled = false
+
+        val loadingIndicator = findViewById<TextView>(R.id.trailer_loading)
+        loadingIndicator.text = "Fetching trailer..."
+
+        fetchYouTubeKey(movieId)
+
+        // Set an OnClickListener to open the YouTube video when the "Watch Trailer" TextView is clicked
+        watchTrailer.setOnClickListener {
+            val youTubeKey = watchTrailer.tag as? String
+            if (!youTubeKey.isNullOrEmpty()) {
+                val youtubeUrl = "https://www.youtube.com/watch?v=$youTubeKey"
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(youtubeUrl))
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Trailer not available", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // Initialize Firebase
@@ -98,6 +133,58 @@ class DetailActivity : AppCompatActivity() {
             alertDialog.show()
         }
     }
+    private fun fetchYouTubeKey(movieId: Int) {
+        val apiKey = "381e5879afdcdcba913bc1f839a6f004"
+        // Create the URL for fetching video information from TMDB using the movieId
+        val url = "https://api.themoviedb.org/3/movie/$movieId/videos?api_key=$apiKey"
+
+        // Create an HTTP request to fetch the video data
+        val request = Request.Builder().url(url).build()
+
+        // Create an instance of OkHttpClient to send the HTTP request
+        val client = OkHttpClient()
+
+        // Enqueue the request and define callback methods for success and failures
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                Log.i("Response", "Received response from the server.")
+                response.use {
+                    if (!response.isSuccessful) {
+                        Log.i("HTTP Error", "Server request was not successful")
+                        return
+                    }
+
+                    // Get the response body as a string
+                    val responseBody = response.body()?.string()
+                    // Parse the JSON response to extract video information
+                    val json = JSONObject(responseBody)
+
+                    // Parse the JSON to get the YouTube key for the first video (if available)
+                    val resultsArray = json.getJSONArray("results")
+                    if (resultsArray.length() > 0) {
+                        val videoObject = resultsArray.getJSONObject(0)
+                        val youTubeKey = videoObject.getString("key")
+
+                        runOnUiThread {
+                            // Set the YouTube key to the watchTrailer TextView
+                            val watchTrailer = findViewById<TextView>(R.id.trailer)
+                            watchTrailer.tag = youTubeKey // Store the key as a tag for later use
+                            watchTrailer.isEnabled = true // Enable the "Watch Trailer" TextView
+
+                            // Hide the loading indicator
+                            val loadingIndicator = findViewById<TextView>(R.id.trailer_loading)
+                            loadingIndicator.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+        })
+    }
+
 
     // For movie details
     private fun populateUI(movie: Movie?) {

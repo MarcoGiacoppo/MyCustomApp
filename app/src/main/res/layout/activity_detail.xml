@@ -182,10 +182,59 @@
                 android:textSize="14sp"
                 android:layout_marginTop="8dp"
                 android:textColor="@color/white"
-
                 app:layout_constraintEnd_toEndOf="@+id/textView15"
                 app:layout_constraintStart_toStartOf="@+id/textView15"
                 app:layout_constraintTop_toBottomOf="@+id/textView15" />
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/trailer"
+                app:srcCompat="@drawable/play"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/trailer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="32dp"
+                android:drawablePadding="5dp"
+                android:drawableTint="@color/white"
+                android:gravity="center_vertical"
+                android:text="Watch Trailer"
+                android:textColor="@color/yellow"
+                android:textSize="16dp"
+                app:layout_constraintEnd_toEndOf="@+id/movieDetailInfo"
+                app:layout_constraintStart_toStartOf="@+id/movieDetailInfo"
+                app:layout_constraintTop_toBottomOf="@+id/movieDetailInfo" />
+
+            <TextView
+                android:id="@+id/trailerInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Please wait a bit when you click on the link as it opens the YouTube app.
+       "
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="@+id/trailer"
+                app:layout_constraintStart_toStartOf="@+id/imageView3"
+                app:layout_constraintTop_toBottomOf="@+id/trailer" />
+
+            <TextView
+                android:id="@+id/trailer_loading"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="@+id/trailerInfo"
+                app:layout_constraintStart_toStartOf="@+id/trailerInfo"
+                app:layout_constraintTop_toBottomOf="@+id/trailerInfo" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

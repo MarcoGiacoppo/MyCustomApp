@@ -163,22 +163,32 @@ class DetailActivity : AppCompatActivity() {
                     // Parse the JSON response to extract video information
                     val json = JSONObject(responseBody)
 
-                    // Parse the JSON to get the YouTube key for the first video (if available)
+                    // Parse the JSON to get the YouTube key for the Official Trailer
                     val resultsArray = json.getJSONArray("results")
-                    if (resultsArray.length() > 0) {
-                        val videoObject = resultsArray.getJSONObject(0)
-                        val youTubeKey = videoObject.getString("key")
+                    var youTubeKey: String? = null
 
-                        runOnUiThread {
-                            // Set the YouTube key to the watchTrailer TextView
-                            val watchTrailer = findViewById<TextView>(R.id.trailer)
-                            watchTrailer.tag = youTubeKey // Store the key as a tag for later use
-                            watchTrailer.isEnabled = true // Enable the "Watch Trailer" TextView
+                    for (i in 0 until resultsArray.length()) {
+                        val videoObject = resultsArray.getJSONObject(i)
+                        val name = videoObject.getString("name")
 
-                            // Hide the loading indicator
-                            val loadingIndicator = findViewById<TextView>(R.id.trailer_loading)
-                            loadingIndicator.visibility = View.GONE
+                        // Changed this code so it fetches the Official Trailer
+                        if (name == "Official Trailer") {
+                            youTubeKey = videoObject.getString("key")
+                            break // Stop iterating once we find the Official Trailer
                         }
+                    }
+                    runOnUiThread {
+                        // Set the YouTube key to the watchTrailer TextView
+                        val watchTrailer = findViewById<TextView>(R.id.trailer)
+                        if (youTubeKey != null) {
+                            watchTrailer.tag = youTubeKey
+                            watchTrailer.isEnabled = true
+                        } else {
+                            watchTrailer.text = "Trailer not available."
+                        }
+                        // Hide the loading indicator
+                        val loadingIndicator = findViewById<TextView>(R.id.trailer_loading)
+                        loadingIndicator.visibility = View.GONE
                     }
                 }
             }

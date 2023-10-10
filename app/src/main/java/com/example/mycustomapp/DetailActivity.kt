@@ -184,7 +184,7 @@ class DetailActivity : AppCompatActivity() {
                             watchTrailer.tag = youTubeKey
                             watchTrailer.isEnabled = true
                         } else {
-                            watchTrailer.text = "Trailer not available."
+                            watchTrailer.text = "Official Trailer not available."
                         }
                         // Hide the loading indicator
                         val loadingIndicator = findViewById<TextView>(R.id.trailer_loading)

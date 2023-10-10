@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ProfileActivity"
+    android:background="@color/main_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:ignore="MissingConstraints">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/cancel"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@drawable/bg_circle_dark"
+                android:padding="8dp"
+                android:src="@drawable/ic_round_arrow_back_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/white" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/profileImageView"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:src="@drawable/avatar1"
+            android:scaleType="centerCrop"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp" />
+
+            <!--Information-->
+        <TextView
+            android:id="@+id/textViewProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:textAlignment="center"
+            android:text="Pick an Avatar by clicking on their names."
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"/>
+
+        <RadioGroup
+            android:id="@+id/avatarSelectionGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Left side options -->
+            <RadioButton
+                android:id="@+id/avatarOption1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Gabimaru"
+                android:textColor="@color/white" />
+
+            <RadioButton
+                android:id="@+id/avatarOption2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sasuke Uchiha"
+                android:textColor="@color/white" />
+
+            <RadioButton
+                android:id="@+id/avatarOption3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Madara Uchiha"
+                android:textColor="@color/white" />
+
+            <RadioButton
+                android:id="@+id/avatarOption4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Megumi Fushiguro"
+                android:textColor="@color/white" />
+
+            <!-- Right side options -->
+            <RadioButton
+                android:id="@+id/avatarOption5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Son Goku"
+                android:textColor="@color/white" />
+
+            <RadioButton
+                android:id="@+id/avatarOption6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Naruto Uzumaki"
+                android:textColor="@color/white" />
+
+            <RadioButton
+                android:id="@+id/avatarOption7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Itachi Uchiha"
+                android:textColor="@color/white" />
+
+            <RadioButton
+                android:id="@+id/avatarOption8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dabi Todoroki"
+                android:textColor="@color/white" />
+        </RadioGroup>
+
+
+        <Button
+            android:id="@+id/saveProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Save Changes"
+            android:layout_gravity="center_horizontal"/>
+
+
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

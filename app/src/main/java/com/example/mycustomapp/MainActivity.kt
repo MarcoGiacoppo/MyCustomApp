@@ -12,19 +12,27 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mycustomapp.adapters.MovieAdapter
 import com.example.mycustomapp.models.Movie
-import com.example.mycustomapp.models.MovieResponse
 import com.example.mycustomapp.services.MovieApiInterface
 import com.example.mycustomapp.services.MovieApiInterface2
 import com.example.mycustomapp.services.MovieApiInterface3
 import com.example.mycustomapp.services.MovieApiService
 import com.google.firebase.auth.FirebaseAuth
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
+class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, CoroutineScope {
 
     private lateinit var rvMoviesList: RecyclerView
+
+    // Create a coroutine job to manage the API requests
+    private val job = Job()
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +42,8 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
         rvMoviesList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         rvMoviesList.setHasFixedSize(true)
 
-        getMovieData { movies: List<Movie> ->
-            rvMoviesList.adapter = MovieAdapter(movies, this)
-        }
+        // Load the user's avatar
+        loadUserAvatar()
 
         // Back button
         val backButton = findViewById<ImageView>(R.id.backBtn)
@@ -45,11 +52,32 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
             logoutUser()
         }
 
+        // Profile button
+        val profileButton = findViewById<ImageView>(R.id.profileBtn)
+        profileButton.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         // Watchlist button
         val watchedList = findViewById<Button>(R.id.listBtn)
         watchedList.setOnClickListener {
             val intent = Intent(this, WatchedListActivity::class.java)
             startActivity(intent)
+        }
+
+        val loadingProgressBar = findViewById<ProgressBar>(R.id.loading1)
+
+        launch {
+            try {
+                val movies = getMoviesFromApi()
+                rvMoviesList.adapter = MovieAdapter(movies, this@MainActivity)
+                loadingProgressBar.visibility = View.GONE
+                rvMoviesList.visibility = View.VISIBLE
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Failed to fetch data", Toast.LENGTH_SHORT).show()
+                loadingProgressBar.visibility = View.GONE
+            }
         }
     }
 
@@ -59,90 +87,42 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
 
         // Pass the selected movie's details to the DetailActivity
         intent.putExtra("movie", movie)
-        // Pass the movie_id to be put inside another api and watch trailer
+        // Pass the movie_id to be put inside another API and watch the trailer
         intent.putExtra("movie_id", movie.id)
 
         // Start the detail activity
         startActivity(intent)
     }
 
-    private fun getMovieData(callback: (List<Movie>) -> Unit) {
+    private suspend fun getMoviesFromApi(): List<Movie> = withContext(Dispatchers.IO) {
         val apiService = MovieApiService.getInstance().create(MovieApiInterface::class.java)
         val apiService2 = MovieApiService.getInstance().create(MovieApiInterface2::class.java)
         val apiService3 = MovieApiService.getInstance().create(MovieApiInterface3::class.java)
         val loadingProgressBar = findViewById<ProgressBar>(R.id.loading1)
 
-
         // Show the progress bar
         loadingProgressBar.visibility = View.VISIBLE
 
-        // Make the first API request (page 1)
-        apiService.getMovieList().enqueue(object : Callback<MovieResponse> {
-            override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
-                if (response.isSuccessful) {
-                    val movies = response.body()?.movies ?: emptyList()
+        // Use async to make concurrent API requests
+        val moviesDeferred = async { apiService.getMovieList().execute() }
+        val moviesPage2Deferred = async { apiService2.getMovieList().execute() }
+        val moviesPage3Deferred = async { apiService3.getMovieList().execute() }
 
-                    // After receiving data from the first request, make the second API request (page 2)
-                    apiService2.getMovieList().enqueue(object : Callback<MovieResponse> {
-                        override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
-                            if (response.isSuccessful) {
-                                val moviesPage2 = response.body()?.movies ?: emptyList()
+        val moviesResponse = moviesDeferred.await()
+        val moviesPage2Response = moviesPage2Deferred.await()
+        val moviesPage3Response = moviesPage3Deferred.await()
 
-                                apiService3.getMovieList().enqueue(object : Callback<MovieResponse> {
-                                    override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
-                                        if (response.isSuccessful) {
-                                            val moviesPage3 = response.body()?.movies ?: emptyList()
+        if (moviesResponse.isSuccessful && moviesPage2Response.isSuccessful && moviesPage3Response.isSuccessful) {
+            val movies = moviesResponse.body()?.movies ?: emptyList()
+            val moviesPage2 = moviesPage2Response.body()?.movies ?: emptyList()
+            val moviesPage3 = moviesPage3Response.body()?.movies ?: emptyList()
 
-                                            // Combine movies from both requests
-                                            val allMovies = movies + moviesPage2 + moviesPage3
-
-                                            // Call the callback with the combined list
-                                            callback(allMovies)
-
-                                            // Hide the loading indicator once the data has been loaded
-                                            loadingProgressBar.visibility = View.GONE
-                                            rvMoviesList.visibility = View.VISIBLE
-
-
-                                        } else {
-                                            // Handle HTTP error for the third API request
-                                            Toast.makeText(this@MainActivity, "Failed to fetch data (page 3)", Toast.LENGTH_SHORT).show()
-                                            // Hide the loading indicator in case of an error
-                                            loadingProgressBar.visibility = View.GONE
-                                        }
-                                    }
-                                    override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                                        // Handle network or other failures for the third API request
-                                        Toast.makeText(this@MainActivity, "Network error (page 3)", Toast.LENGTH_SHORT).show()
-                                    }
-                                })
-                            } else {
-                                // Handle HTTP error for the second API request
-                                Toast.makeText(this@MainActivity, "Failed to fetch data (page 2)", Toast.LENGTH_SHORT).show()
-                                // Hide the loading indicator in case of an error
-                                loadingProgressBar.visibility = View.GONE
-                            }
-                        }
-
-                        override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                            // Handle network or other failures for the second API request
-                            Toast.makeText(this@MainActivity, "Network error (page 2)", Toast.LENGTH_SHORT).show()
-                        }
-                    })
-                } else {
-                    // Handle HTTP error for the first API request
-                    Toast.makeText(this@MainActivity, "Failed to fetch data (page 1)", Toast.LENGTH_SHORT).show()
-                    // Hide the loading indicator in case of an error
-                    loadingProgressBar.visibility = View.GONE
-                }
-            }
-
-            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                // Handle network or other failures for the first API request
-                Toast.makeText(this@MainActivity, "Network error (page 1)", Toast.LENGTH_SHORT).show()
-            }
-        })
+            return@withContext movies + moviesPage2 + moviesPage3
+        } else {
+            throw Exception("Failed to fetch data")
+        }
     }
+
     // After users presses on the sign out button, they won't be able to edit data
     private fun logoutUser() {
         // Sign out the user using Firebase Authentication
@@ -152,5 +132,49 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener {
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    private fun loadUserAvatar() {
+        // Get the currently logged-in user
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userId = user.uid
+
+            // Retrieve the user's "avatar" field from the database
+            val database = FirebaseDatabase.getInstance()
+            val usersRef = database.getReference("Users")
+
+            usersRef.child(userId).child("avatar").addListenerForSingleValueEvent(object :
+                ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    // Get the selected avatar identifier
+                    val selectedAvatarId = dataSnapshot.getValue(String::class.java)
+
+                    // Update the ImageView with the selected avatar
+                    val profileImageView = findViewById<ImageView>(R.id.profileBtn)
+                    when (selectedAvatarId) {
+                        "avatar1" -> profileImageView.setImageResource(R.drawable.avatar1)
+                        "avatar2" -> profileImageView.setImageResource(R.drawable.avatar2)
+                        "avatar3" -> profileImageView.setImageResource(R.drawable.avatar3)
+                        "avatar4" -> profileImageView.setImageResource(R.drawable.avatar4)
+                        "avatar5" -> profileImageView.setImageResource(R.drawable.avatar5)
+                        "avatar6" -> profileImageView.setImageResource(R.drawable.avatar6)
+                        "avatar7" -> profileImageView.setImageResource(R.drawable.avatar7)
+                        "avatar8" -> profileImageView.setImageResource(R.drawable.avatar8)
+                        // Add more cases for additional avatar options
+                        else -> profileImageView.setImageResource(R.drawable.ic_round_person_24) // Default avatar
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Handle any errors here
+                }
+            })
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel() // Cancel the coroutine job when the activity is destroyed
     }
 }

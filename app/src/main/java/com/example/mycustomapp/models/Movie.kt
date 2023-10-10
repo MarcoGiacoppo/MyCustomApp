@@ -42,5 +42,13 @@ data class WatchlistItem(
     constructor() : this(null, null, "", 0.0f, "", "")
 }
 
+data class UserProfile(
+    val userId: String,
+    val displayName: String?,
+    val email: String?
+) {
+    constructor() : this("","","")
+}
+
 
 

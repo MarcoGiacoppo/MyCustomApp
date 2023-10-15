@@ -6,12 +6,14 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.Switch
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mycustomapp.adapters.MovieAdapter
 import com.example.mycustomapp.models.Movie
+import com.example.mycustomapp.models.MovieResponse
 import com.example.mycustomapp.services.MovieApiInterface
 import com.example.mycustomapp.services.MovieApiInterface2
 import com.example.mycustomapp.services.MovieApiInterface3
@@ -21,18 +23,17 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, CoroutineScope {
+class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
 
     private lateinit var rvMoviesList: RecyclerView
-
-    // Create a coroutine job to manage the API requests
-    private val job = Job()
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,25 +60,32 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, Coro
             startActivity(intent)
         }
 
-        // Watchlist button
-        val watchedList = findViewById<Button>(R.id.listBtn)
-        watchedList.setOnClickListener {
+        val toggleSwitch = findViewById<Switch>(R.id.toggleSwitch)
+        val listButton = findViewById<Button>(R.id.listBtn)
+
+        // Set the initial click behaviour of the button
+        listButton.setOnClickListener {
             val intent = Intent(this, WatchedListActivity::class.java)
             startActivity(intent)
         }
 
-        val loadingProgressBar = findViewById<ProgressBar>(R.id.loading1)
-
-        launch {
-            try {
-                val movies = getMoviesFromApi()
-                rvMoviesList.adapter = MovieAdapter(movies, this@MainActivity)
-                loadingProgressBar.visibility = View.GONE
-                rvMoviesList.visibility = View.VISIBLE
-            } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Failed to fetch data", Toast.LENGTH_SHORT).show()
-                loadingProgressBar.visibility = View.GONE
+        toggleSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                listButton.text = "Recommendation"
+                listButton.setOnClickListener {
+                    val intent = Intent(this, RecommendationActivity::class.java)
+                    startActivity(intent)
+                }
+            } else {
+                listButton.text = "My Watched List"
+                listButton.setOnClickListener {
+                    val intent = Intent(this, WatchedListActivity::class.java)
+                    startActivity(intent)
+                }
             }
+        }
+        getMovieData { movies: List<Movie> ->
+            rvMoviesList.adapter = MovieAdapter(movies, this)
         }
     }
 
@@ -94,7 +102,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, Coro
         startActivity(intent)
     }
 
-    private suspend fun getMoviesFromApi(): List<Movie> = withContext(Dispatchers.IO) {
+    private fun getMovieData(callback: (List<Movie>) -> Unit) {
         val apiService = MovieApiService.getInstance().create(MovieApiInterface::class.java)
         val apiService2 = MovieApiService.getInstance().create(MovieApiInterface2::class.java)
         val apiService3 = MovieApiService.getInstance().create(MovieApiInterface3::class.java)
@@ -103,25 +111,42 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, Coro
         // Show the progress bar
         loadingProgressBar.visibility = View.VISIBLE
 
-        // Use async to make concurrent API requests
-        val moviesDeferred = async { apiService.getMovieList().execute() }
-        val moviesPage2Deferred = async { apiService2.getMovieList().execute() }
-        val moviesPage3Deferred = async { apiService3.getMovieList().execute() }
+        // Use Kotlin Coroutines to perform asynchronous network requests
+        // Launch a new coroutine to fetch data
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response1 = apiService.getMovieList().execute()
+                val response2 = apiService2.getMovieList().execute()
+                val response3 = apiService3.getMovieList().execute()
 
-        val moviesResponse = moviesDeferred.await()
-        val moviesPage2Response = moviesPage2Deferred.await()
-        val moviesPage3Response = moviesPage3Deferred.await()
+                if (response1.isSuccessful && response2.isSuccessful && response3.isSuccessful) {
+                    val movies = (response1.body()?.movies ?: emptyList()) +
+                            (response2.body()?.movies ?: emptyList()) +
+                            (response3.body()?.movies ?: emptyList())
 
-        if (moviesResponse.isSuccessful && moviesPage2Response.isSuccessful && moviesPage3Response.isSuccessful) {
-            val movies = moviesResponse.body()?.movies ?: emptyList()
-            val moviesPage2 = moviesPage2Response.body()?.movies ?: emptyList()
-            val moviesPage3 = moviesPage3Response.body()?.movies ?: emptyList()
-
-            return@withContext movies + moviesPage2 + moviesPage3
-        } else {
-            throw Exception("Failed to fetch data")
+                    // Switch to the main thread to update the UI
+                    withContext(Dispatchers.Main) {
+                        callback(movies)
+                        // Hide the loading indicator
+                        loadingProgressBar.visibility = View.GONE
+                    }
+                } else {
+                    // Handle network request errors
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@MainActivity, "Failed to fetch data", Toast.LENGTH_SHORT).show()
+                        // Hide the loading indicator in case of an error
+                        loadingProgressBar.visibility = View.GONE
+                    }
+                }
+            } catch (e: Exception) {
+                // Handle exceptions
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, "Network error", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
+
 
     // After users presses on the sign out button, they won't be able to edit data
     private fun logoutUser() {
@@ -171,10 +196,5 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, Coro
                 }
             })
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        job.cancel() // Cancel the coroutine job when the activity is destroyed
     }
 }

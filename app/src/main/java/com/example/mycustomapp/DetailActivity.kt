@@ -21,9 +21,12 @@ import com.example.mycustomapp.models.WatchlistItem
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.*
 import org.json.JSONObject
-import java.io.IOException
 
 
 class DetailActivity : AppCompatActivity() {
@@ -58,8 +61,14 @@ class DetailActivity : AppCompatActivity() {
         val loadingIndicator = findViewById<TextView>(R.id.trailer_loading)
         loadingIndicator.text = "Fetching trailer..."
 
-        fetchYouTubeKey(movieId)
-
+        GlobalScope.launch(Dispatchers.IO) {
+            val youTubekey = fetchYouTubeKey(movieId)
+            withContext(Dispatchers.Main) {
+                watchTrailer.tag = youTubekey
+                watchTrailer.isEnabled = youTubekey != null
+                loadingIndicator.visibility = View.GONE
+            }
+        }
         // Set an OnClickListener to open the YouTube video when the "Watch Trailer" TextView is clicked
         watchTrailer.setOnClickListener {
             val youTubeKey = watchTrailer.tag as? String
@@ -77,22 +86,21 @@ class DetailActivity : AppCompatActivity() {
         movieReference = database.getReference("Reviews")
 
         val heartImg = findViewById<ImageView>(R.id.save)
-        // Set a click listener when the save button is pressed
+        // Set a click listener when the heart image is pressed
         heartImg.setOnClickListener {
             // Inflate the dialog layout
             val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_rate_review, null)
+            // Create an AlertDialog
+            val alertDialog = AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setTitle("Rate and Review")
+                .create()
 
             // Initialize views from the inflated dialog view
             val ratingBar = dialogView.findViewById<RatingBar>(R.id.ratingBar)
             val reviewEditText = dialogView.findViewById<EditText>(R.id.reviewEditText)
             val saveButton = dialogView.findViewById<Button>(R.id.saveButton)
             val cancelButton = dialogView.findViewById<Button>(R.id.cancelButton)
-
-            // Create an AlertDialog
-            val alertDialog = AlertDialog.Builder(this)
-                .setView(dialogView)
-                .setTitle("Rate and Review")
-                .create()
 
             // Set a click listener for the Save Button
             saveButton.setOnClickListener {
@@ -111,17 +119,25 @@ class DetailActivity : AppCompatActivity() {
                         if (user!= null) {
                             val userId = user.uid
 
-                        // Save the review to Firebase with a push key
-                        val reviewKey = movieReference.push().key
-                        // Save the review to Firebase
-                        reviewKey?.let { key ->
-                            val newReview = WatchlistItem(key, userId, movie.title ?: "", rating, review, movie.poster)
-                            movieReference.child(key).setValue(newReview)
-                            alertDialog.dismiss()
+                            // Save the review to Firebase with a push key
+                            val reviewKey = movieReference.push().key
+                            // Save the review to Firebase
+                            reviewKey?.let { key ->
+                                val newReview = WatchlistItem(
+                                    key,
+                                    userId,
+                                    movie.title ?: "",
+                                    rating,
+                                    review,
+                                    movie.poster,
+                                    movieId
+                                )
+                                movieReference.child(key).setValue(newReview)
+                                alertDialog.dismiss()
 
-                            val intent = Intent(this, WatchedListActivity::class.java)
-                            startActivity(intent)
-                        }
+                                val intent = Intent(this, WatchedListActivity::class.java)
+                                startActivity(intent)
+                            }
                         }
                     }
                 }
@@ -133,67 +149,34 @@ class DetailActivity : AppCompatActivity() {
             alertDialog.show()
         }
     }
-    private fun fetchYouTubeKey(movieId: Int) {
+
+    private suspend fun fetchYouTubeKey(movieId: Int): String? {
         val apiKey = "381e5879afdcdcba913bc1f839a6f004"
-        // Create the URL for fetching video information from TMDb using the movieId
         val url = "https://api.themoviedb.org/3/movie/$movieId/videos?api_key=$apiKey"
 
-        // Create an HTTP request to fetch the video data
-        val request = Request.Builder().url(url).build()
+        return withContext(Dispatchers.IO) {
+            val client = OkHttpClient()
+            val request = Request.Builder().url(url).build()
+            val response = client.newCall(request).execute()
 
-        // Create an instance of OkHttpClient to send the HTTP request
-        val client = OkHttpClient()
+            if (response.isSuccessful) {
+                val responseBody = response.body()?.string()
+                val json = JSONObject(responseBody)
 
-        // Enqueue the request and define callback methods for success and failures
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-            }
+                val resultsArray = json.getJSONArray("results")
+                for (i in 0 until resultsArray.length()) {
+                    val videoObject = resultsArray.getJSONObject(i)
+                    val name = videoObject.getString("name")
 
-            override fun onResponse(call: Call, response: Response) {
-                Log.i("Response", "Received response from the server.")
-                response.use {
-                    if (!response.isSuccessful) {
-                        Log.i("HTTP Error", "Server request was not successful")
-                        return
-                    }
-
-                    // Get the response body as a string
-                    val responseBody = response.body()?.string()
-                    // Parse the JSON response to extract video information
-                    val json = JSONObject(responseBody)
-
-                    // Parse the JSON to get the YouTube key for the Official Trailer
-                    val resultsArray = json.getJSONArray("results")
-                    var youTubeKey: String? = null
-
-                    for (i in 0 until resultsArray.length()) {
-                        val videoObject = resultsArray.getJSONObject(i)
-                        val name = videoObject.getString("name")
-
-                        // Changed this code so it fetches the Official Trailer
-                        if (name == "Official Trailer") {
-                            youTubeKey = videoObject.getString("key")
-                            break // Stop iterating once we find the Official Trailer
-                        }
-                    }
-                    runOnUiThread {
-                        // Set the YouTube key to the watchTrailer TextView
-                        val watchTrailer = findViewById<TextView>(R.id.trailer)
-                        if (youTubeKey != null) {
-                            watchTrailer.tag = youTubeKey
-                            watchTrailer.isEnabled = true
-                        } else {
-                            watchTrailer.text = "Official Trailer not available."
-                        }
-                        // Hide the loading indicator
-                        val loadingIndicator = findViewById<TextView>(R.id.trailer_loading)
-                        loadingIndicator.visibility = View.GONE
+                    if (name == "Official Trailer") {
+                        return@withContext videoObject.getString("key")
                     }
                 }
             }
-        })
+            return@withContext null
+        }
     }
+
 
 
     // For movie details

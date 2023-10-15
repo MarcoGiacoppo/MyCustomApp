@@ -128,8 +128,8 @@
                     android:id="@+id/textView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:text="Popular Movies:"
+                    android:layout_marginLeft="10dp"
+                    android:text="Popular Movies"
                     android:textColor="#ffc107"
                     android:textSize="18sp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -180,13 +180,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
-                    android:text="Pick a movie you've watched and save it!\n\n Or just click the button down below"
+                    android:text=" Try to press on the switch!"
                     android:textColor="#ffc107"
                     android:textAlignment="center"
                     android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <Switch
+                    android:id="@+id/toggleSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintBottom_toTopOf="@+id/listBtn"
+                    app:layout_constraintEnd_toEndOf="@+id/listBtn"
+                    app:layout_constraintStart_toStartOf="@+id/listBtn" />
 
                 <Button
                     android:id="@+id/listBtn"

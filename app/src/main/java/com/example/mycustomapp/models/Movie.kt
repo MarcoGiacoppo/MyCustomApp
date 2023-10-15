@@ -37,9 +37,10 @@ data class WatchlistItem(
     val movieTitle: String,
     val userRating: Float,
     val userReview: String,
-    val posterUrl: String?
+    val posterUrl: String?,
+    val id: Int?
 ) {
-    constructor() : this(null, null, "", 0.0f, "", "")
+    constructor() : this(null, null, "", 0.0f, "", "", 0)
 }
 
 data class UserProfile(

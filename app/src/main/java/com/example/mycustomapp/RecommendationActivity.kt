@@ -101,6 +101,7 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
                             Toast.makeText(this@RecommendationActivity, "You need to have at least one 5-star rating to get recommendations.", Toast.LENGTH_LONG).show()
                         } else {
                             launch {
+                                progressBar.visibility = View.VISIBLE
                                 val recommendedMovies =
                                     fetchRecommendations(recommendedMovieIds, apiKey)
                                 rvRecommendedMovies.adapter =

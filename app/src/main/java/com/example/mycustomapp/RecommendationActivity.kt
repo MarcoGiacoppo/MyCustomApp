@@ -1,6 +1,5 @@
 package com.example.mycustomapp
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -66,13 +65,11 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
         // Start the detail activity
         startActivity(intent)
     }
-
     private fun fetchRecommendedMovies() {
         val apiKey = "381e5879afdcdcba913bc1f839a6f004"
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         val progressBar = findViewById<ProgressBar>(R.id.progressrec)
-
-            if (userId != null) {
+        if (userId != null) {
                 // Query the Firebase database for reviews with userRating = 5
                 val reviewsReference = FirebaseDatabase.getInstance().getReference("Reviews")
                 val fiveStarReviewQuery = reviewsReference

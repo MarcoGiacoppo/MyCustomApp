@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:layout_margin="16dp"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/dark">
 
     <!-- RatingBar for movie rating -->
     <RatingBar
@@ -18,7 +19,8 @@
         android:stepSize="0.5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/CustomRatingBar"/>
 
     <!-- EditText for movie review -->
     <EditText
@@ -29,7 +31,8 @@
         android:hint="Write your review..."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ratingBar" />
+        app:layout_constraintTop_toBottomOf="@+id/ratingBar"
+        style="@style/CustomEditText"/>
 
     <!-- Save button -->
     <Button
@@ -39,7 +42,8 @@
         android:layout_marginTop="16dp"
         android:text="Save"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reviewEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/reviewEditText"
+        style="@style/CustomButton"/>
 
     <!-- Cancel button -->
     <Button
@@ -49,5 +53,6 @@
         android:layout_marginTop="16dp"
         android:text="Cancel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reviewEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/reviewEditText"
+        style="@style/CustomButton"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

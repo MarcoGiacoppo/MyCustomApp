@@ -113,7 +113,7 @@ class WatchedListActivity : AppCompatActivity(),
 
             // Show a dialog to edit userRating and userReview
             val editDialogView = LayoutInflater.from(this).inflate(R.layout.edit_dialog, null)
-            val editDialog = AlertDialog.Builder(this)
+            val editDialog = AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
                 .setTitle("Edit Item")
                 .setView(editDialogView)
                 .setPositiveButton("Save") { dialog, _ ->

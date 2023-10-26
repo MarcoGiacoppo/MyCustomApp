@@ -91,7 +91,7 @@ class DetailActivity : AppCompatActivity() {
             // Inflate the dialog layout
             val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_rate_review, null)
             // Create an AlertDialog
-            val alertDialog = AlertDialog.Builder(this)
+            val alertDialog = AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
                 .setView(dialogView)
                 .setTitle("Rate and Review")
                 .create()

@@ -24,6 +24,7 @@
                     android:id="@+id/mainTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/title"
                     android:shadowColor="#FF0000"
                     android:shadowDx="5"
                     android:shadowDy="5"
@@ -31,8 +32,9 @@
                     android:text="Ciné-rate"
                     android:textAlignment="center"
                     android:textColor="@android:color/white"
-                    android:textSize="50sp"
+                    android:textSize="35sp"
                     android:textStyle="italic"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -72,8 +74,9 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="8dp"
                     android:text="Recommendation"
+                    android:fontFamily="@font/text"
                     android:textColor="#ffc107"
-                    android:textSize="14sp"
+                    android:textSize="21sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -116,8 +119,9 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
                     android:text="Top Rated Movies of all time"
+                    android:fontFamily="@font/text"
                     android:textColor="#ffc107"
-                    android:textSize="14sp"
+                    android:textSize="21sp"
                     app:layout_constraintBottom_toTopOf="@+id/topratedRV"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

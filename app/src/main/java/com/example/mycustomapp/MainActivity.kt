@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -58,6 +59,24 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
         profileButton.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
+        }
+
+        // Testing new feature
+        val popularMoviesTextView = findViewById<TextView>(R.id.popularText)
+        val playingNowTextView = findViewById<TextView>(R.id.playingText)
+
+        popularMoviesTextView.setOnClickListener {
+            popularMoviesTextView.setTextColor(resources.getColor(R.color.yellow))
+            playingNowTextView.setTextColor(resources.getColor(R.color.greyText))
+            playingNowTextView.isEnabled = true
+            popularMoviesTextView.isEnabled = false
+        }
+
+        playingNowTextView.setOnClickListener {
+            playingNowTextView.setTextColor(resources.getColor(R.color.yellow))
+            popularMoviesTextView.setTextColor(resources.getColor(R.color.greyText))
+            popularMoviesTextView.isEnabled = true
+            playingNowTextView.isEnabled = false
         }
 
         val toggleSwitch = findViewById<Switch>(R.id.toggleSwitch)

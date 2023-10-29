@@ -29,10 +29,10 @@
                     android:shadowDx="5"
                     android:shadowDy="5"
                     android:shadowRadius="10"
-                    android:text="Ciné-rate"
+                    android:text="      Explore More"
                     android:textAlignment="center"
                     android:textColor="@android:color/white"
-                    android:textSize="35sp"
+                    android:textSize="25sp"
                     android:textStyle="italic"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -48,7 +48,7 @@
                     android:src="@drawable/ic_round_arrow_back_24"
                     app:layout_constraintBottom_toBottomOf="@+id/mainTitle"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/mainTitle"
                     app:tint="@color/white" />
 
                 <View
@@ -68,13 +68,13 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/textView11"
+                    android:id="@+id/recommendationTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:text="Recommendation"
                     android:fontFamily="@font/text"
+                    android:text="Recommendation"
                     android:textColor="#ffc107"
                     android:textSize="21sp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -84,16 +84,15 @@
                     android:id="@+id/recommendationRV"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="11dp"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView11" />
+                    app:layout_constraintTop_toBottomOf="@+id/recommendationTextView" />
 
                 <ProgressBar
-                    android:id="@+id/progressrec"
+                    android:id="@+id/progressRec"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
@@ -109,20 +108,17 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="15dp">
+                android:layout_marginTop="5dp">
 
                 <TextView
-                    android:id="@+id/textView8"
+                    android:id="@+id/topRatedTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="Top Rated Movies of all time"
+                    android:layout_marginStart="16dp"
                     android:fontFamily="@font/text"
+                    android:text="Top Rated"
                     android:textColor="#ffc107"
                     android:textSize="21sp"
-                    app:layout_constraintBottom_toTopOf="@+id/topratedRV"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -135,10 +131,11 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/topRatedTextView" />
 
                 <ProgressBar
-                    android:id="@+id/progressBar"
+                    android:id="@+id/progressTopRated"
                     style="?android:attr/progressBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -146,7 +143,49 @@
                     app:layout_constraintBottom_toBottomOf="@+id/topratedRV"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/topratedRV"
-                    app:layout_constraintTop_toBottomOf="@+id/textView8"
+                    app:layout_constraintTop_toBottomOf="@+id/topRatedTextView"
+                    tools:visibility="visible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:id="@+id/upcomingTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="@font/text"
+                    android:text="Upcoming"
+                    android:textColor="#ffc107"
+                    android:textSize="21sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/upcomingRV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/upcomingTextView" />
+
+                <ProgressBar
+                    android:id="@+id/progressUpcoming"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@+id/upcomingRV"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/upcomingRV"
+                    app:layout_constraintTop_toBottomOf="@+id/upcomingTextView"
                     tools:visibility="visible" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>

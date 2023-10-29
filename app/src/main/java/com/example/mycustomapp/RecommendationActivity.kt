@@ -13,6 +13,7 @@ import com.example.mycustomapp.adapters.MovieAdapter
 import com.example.mycustomapp.models.Movie
 import com.example.mycustomapp.services.RecommendationMovie
 import com.example.mycustomapp.services.TopRatedMovie
+import com.example.mycustomapp.services.UpcomingMovie
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -51,6 +52,9 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
 
         // Fetch and populate Top Rated movies
         fetchTopRatedMovies()
+
+        // Fetch and populate Upcoming movies
+        fetchUpcomingMovies()
     }
 
     override fun onItemClick(movie: Movie) {
@@ -68,56 +72,60 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
     private fun fetchRecommendedMovies() {
         val apiKey = "381e5879afdcdcba913bc1f839a6f004"
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val progressBar = findViewById<ProgressBar>(R.id.progressrec)
+        val progressBar = findViewById<ProgressBar>(R.id.progressRec)
         if (userId != null) {
-                // Query the Firebase database for reviews with userRating = 5
-                val reviewsReference = FirebaseDatabase.getInstance().getReference("Reviews")
-                val fiveStarReviewQuery = reviewsReference
-                    .orderByChild("userId")
-                    .equalTo(userId)
+            // Query the Firebase database for reviews with userRating = 5
+            val reviewsReference = FirebaseDatabase.getInstance().getReference("Reviews")
+            val fiveStarReviewQuery = reviewsReference
+                .orderByChild("userId")
+                .equalTo(userId)
 
-                fiveStarReviewQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val recommendedMovieIds = mutableListOf<Int>()
+            fiveStarReviewQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val recommendedMovieIds = mutableListOf<Int>()
 
-                        for (reviewSnapshot in snapshot.children) {
-                            // Check the rating field of each review
-                            val rating =
-                                reviewSnapshot.child("userRating").getValue(Int::class.java)
-                            if (rating != null && rating == 5) {
-                                // Extract the movie_id if the rating is 5
-                                val movieId = reviewSnapshot.child("id").getValue(Int::class.java)
-                                if (movieId != null) {
-                                    recommendedMovieIds.add(movieId)
-                                }
+                    for (reviewSnapshot in snapshot.children) {
+                        // Check the rating field of each review
+                        val rating =
+                            reviewSnapshot.child("userRating").getValue(Int::class.java)
+                        if (rating != null && rating == 5) {
+                            // Extract the movie_id if the rating is 5
+                            val movieId = reviewSnapshot.child("id").getValue(Int::class.java)
+                            if (movieId != null) {
+                                recommendedMovieIds.add(movieId)
                             }
                         }
-                        if (recommendedMovieIds.isEmpty()) {
+                    }
+                    if (recommendedMovieIds.isEmpty()) {
+                        progressBar.visibility = View.VISIBLE
+                        // Show a Toast message if there are no 5-star ratings
+                        Toast.makeText(
+                            this@RecommendationActivity,
+                            "You need to have at least one 5-star rating to get recommendations.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        launch {
                             progressBar.visibility = View.VISIBLE
-                            // Show a Toast message if there are no 5-star ratings
-                            Toast.makeText(this@RecommendationActivity, "You need to have at least one 5-star rating to get recommendations.", Toast.LENGTH_LONG).show()
-                        } else {
-                            launch {
-                                progressBar.visibility = View.VISIBLE
-                                val recommendedMovies =
-                                    fetchRecommendations(recommendedMovieIds, apiKey)
-                                rvRecommendedMovies.adapter =
-                                    MovieAdapter(recommendedMovies, this@RecommendationActivity)
-                                rvRecommendedMovies.adapter?.notifyDataSetChanged()
+                            val recommendedMovies =
+                                fetchRecommendations(recommendedMovieIds, apiKey)
+                            rvRecommendedMovies.adapter =
+                                MovieAdapter(recommendedMovies, this@RecommendationActivity)
+                            rvRecommendedMovies.adapter?.notifyDataSetChanged()
 
-                                progressBar.visibility = View.GONE
-                            }
+                            progressBar.visibility = View.GONE
                         }
                     }
+                }
 
-                    override fun onCancelled(error: DatabaseError) {
+                override fun onCancelled(error: DatabaseError) {
                     // Handle errors
-                    }
-                })
-            }
+                }
+            })
         }
+    }
 
-        private suspend fun fetchRecommendations(movieIds: List<Int>, apiKey: String): List<Movie> {
+    private suspend fun fetchRecommendations(movieIds: List<Int>, apiKey: String): List<Movie> {
             val retrofit = Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org/3/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -141,9 +149,9 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
             return recommendedMovies
         }
 
-        private fun fetchTopRatedMovies() {
+    private fun fetchTopRatedMovies() {
             val apiKey = "381e5879afdcdcba913bc1f839a6f004"
-            val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+            val progressBar = findViewById<ProgressBar>(R.id.progressTopRated)
 
             launch {
                 progressBar.visibility = View.VISIBLE
@@ -160,7 +168,7 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
             }
         }
 
-        private suspend fun fetchTopRatedMovies(apiKey: String): List<Movie> {
+    private suspend fun fetchTopRatedMovies(apiKey: String): List<Movie> {
             val retrofit = Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org/3/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -178,6 +186,44 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
                 emptyList()
             }
         }
+
+    private fun fetchUpcomingMovies() {
+        val apiKey = "381e5879afdcdcba913bc1f839a6f004"
+        val progressBar = findViewById<ProgressBar>(R.id.progressUpcoming)
+
+        launch {
+            progressBar.visibility = View.VISIBLE
+
+            val upcomingMovies = fetchUpcomingMovies(apiKey)
+
+            if (upcomingMovies.isNotEmpty()) {
+                val upcomingRecyclerView = findViewById<RecyclerView>(R.id.upcomingRV)
+
+                upcomingRecyclerView.layoutManager = LinearLayoutManager(this@RecommendationActivity, LinearLayoutManager.HORIZONTAL, false)
+                upcomingRecyclerView.adapter = MovieAdapter(upcomingMovies, this@RecommendationActivity)
+                progressBar.visibility = View.GONE
+            }
+        }
+    }
+
+    private suspend fun fetchUpcomingMovies(apiKey: String): List<Movie> {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.themoviedb.org/3/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val apiService = retrofit.create(UpcomingMovie::class.java)
+
+        val upcomingMovieResponse = withContext(Dispatchers.IO) {
+            apiService.getUpcomingMovies(apiKey).execute()
+        }
+
+        return if (upcomingMovieResponse.isSuccessful) {
+            upcomingMovieResponse.body()?.movies ?: emptyList()
+        } else {
+            emptyList()
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()

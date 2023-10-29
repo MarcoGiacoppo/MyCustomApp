@@ -11,6 +11,7 @@ import android.widget.ProgressBar
 import android.widget.RatingBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mycustomapp.adapters.WatchedAdapter
@@ -29,6 +30,7 @@ class WatchedListActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         val binding = ActivityWatchedListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -59,6 +61,26 @@ class WatchedListActivity : AppCompatActivity(),
         val backBtn = findViewById<ImageView>(R.id.back)
         backBtn.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Navbar
+        val homeButton = findViewById<ImageView>(R.id.homeImage2)
+        val movieButton = findViewById<ImageView>(R.id.moviesImage2)
+        val listButtons = findViewById<ImageView>(R.id.listImage2)
+
+        homeButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        movieButton.setOnClickListener {
+            val intent = Intent(this, RecommendationActivity::class.java)
+            startActivity(intent)
+        }
+
+        listButtons.setOnClickListener {
+            val intent = Intent(this, WatchedListActivity::class.java)
             startActivity(intent)
         }
 

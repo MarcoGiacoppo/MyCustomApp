@@ -15,6 +15,7 @@ import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.WindowCompat
 import com.bumptech.glide.Glide
 import com.example.mycustomapp.models.Movie
 import com.example.mycustomapp.models.WatchlistItem
@@ -35,6 +36,7 @@ class DetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_detail)
 
         // Retrieve the movie details from the Intent extras
@@ -80,7 +82,6 @@ class DetailActivity : AppCompatActivity() {
                 Toast.makeText(this, "Trailer not available", Toast.LENGTH_SHORT).show()
             }
         }
-
         // Initialize Firebase
         database = FirebaseDatabase.getInstance()
         movieReference = database.getReference("Reviews")

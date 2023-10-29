@@ -35,10 +35,11 @@
 
             <ImageView
                 android:id="@+id/imageView2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_marginTop="16dp"
-                app:srcCompat="@drawable/btn_4" />
+                android:layout_gravity="center_horizontal"
+                app:srcCompat="@drawable/register" />
 
             <EditText
                 android:id="@+id/registerUser"

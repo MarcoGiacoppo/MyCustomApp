@@ -9,6 +9,7 @@
     tools:context=".DetailActivity">
 
     <ScrollView
+        android:id="@+id/scrollView3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/main_background"
@@ -57,9 +58,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
+                android:paddingTop="35dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="@+id/constraintLayout">
 
                 <ImageView
                     android:id="@+id/save"
@@ -85,6 +87,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout3"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:background="@drawable/bg_shadow"
@@ -136,7 +139,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:drawableStart="@drawable/thumbs"
+                        android:drawableStart="@drawable/baseline_thumb_up_alt_24"
                         android:drawablePadding="5dp"
                         android:drawableTint="@color/white"
                         android:gravity="center_vertical"
@@ -178,10 +181,10 @@
                 android:id="@+id/movieDetailInfo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="test"
-                android:textSize="14sp"
                 android:layout_marginTop="8dp"
+                android:text="test"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="@+id/textView15"
                 app:layout_constraintStart_toStartOf="@+id/textView15"
                 app:layout_constraintTop_toBottomOf="@+id/textView15" />
@@ -191,8 +194,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:drawablePadding="5dp"
                 android:drawableStart="@drawable/baseline_play_arrow_24"
+                android:drawablePadding="5dp"
                 android:drawableTint="@color/white"
                 android:gravity="center_vertical"
                 android:text="Watch Trailer"
@@ -218,9 +221,9 @@
                 android:id="@+id/trailer_loading"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:textColor="@color/white"
                 android:textSize="14sp"
-                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="@+id/trailerInfo"
                 app:layout_constraintStart_toStartOf="@+id/trailerInfo"
                 app:layout_constraintTop_toBottomOf="@+id/trailerInfo" />

@@ -29,6 +29,11 @@
         </item>
     </style>
 
+    <style name="CustomSearchView" parent="Widget.AppCompat.SearchView">
+        <!-- Customize the query hint text color -->
+        <item name="android:textColorHint">@color/grey</item>
+    </style>
+
     <style name="CustomAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <!-- Set the title area background color -->
         <item name="android:windowBackground">@color/dark</item>

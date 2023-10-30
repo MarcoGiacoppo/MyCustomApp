@@ -13,9 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyCustomApp">
         <activity
+            android:name=".SearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".RecommendationActivity"
             android:exported="false"
-            android:theme="@style/NoActionBarAndStatusBar"/>
+            android:theme="@style/NoActionBarAndStatusBar" />
         <activity
             android:name=".ProfileActivity"
             android:exported="false"
@@ -49,7 +52,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

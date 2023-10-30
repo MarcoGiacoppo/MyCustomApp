@@ -51,5 +51,32 @@ data class UserProfile(
     constructor() : this("","","")
 }
 
+@Parcelize
+data class TVShow(
+    @SerializedName("id")
+    val id : Int?, // Tv show ID
+
+    @SerializedName("name")
+    val name : String?, // TV show name
+
+    @SerializedName("poster_path")
+    val poster : String?, // URL of the movie poster
+
+    @SerializedName("vote_average")
+    val vote : String?, // Movie rating
+
+    @SerializedName("first_air_date")
+    val date : String?, // Release date of the TV Show
+
+    @SerializedName("overview")
+    val detail : String?, // TV Show description
+
+    @SerializedName("vote_count")
+    val numbers : String? // Vote Count
+
+) : Parcelable{
+    constructor() : this(null,"","","","","","")
+}
+
 
 

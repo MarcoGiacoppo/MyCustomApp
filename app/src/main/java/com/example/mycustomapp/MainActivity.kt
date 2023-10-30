@@ -12,13 +12,19 @@ import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mycustomapp.adapters.MovieAdapter
+import com.example.mycustomapp.adapters.TVShowAdapter
 import com.example.mycustomapp.models.Movie
+import com.example.mycustomapp.models.TVShow
 import com.example.mycustomapp.services.MovieApiInterface
 import com.example.mycustomapp.services.MovieApiInterface2
 import com.example.mycustomapp.services.MovieApiInterface3
 import com.example.mycustomapp.services.MovieApiService
-import com.example.mycustomapp.services.PlayingNowInterface1
-import com.example.mycustomapp.services.PlayingNowInterface2
+import com.example.mycustomapp.services.TopRatedMovieInterface1
+import com.example.mycustomapp.services.TopRatedMovieInterface2
+import com.example.mycustomapp.services.popularTVshowInterface1
+import com.example.mycustomapp.services.popularTVshowInterface2
+import com.example.mycustomapp.services.topRatedTVshowInterface1
+import com.example.mycustomapp.services.topRatedTVshowInterface2
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -30,9 +36,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
+class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVShowAdapter.OnItemClickListener{
 
     private lateinit var rvMoviesList: RecyclerView
+    private lateinit var rvMoviesList2: RecyclerView
+
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +50,10 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
         rvMoviesList = findViewById(R.id.rv_movies_list)
         rvMoviesList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         rvMoviesList.setHasFixedSize(true)
+
+        rvMoviesList2 = findViewById(R.id.rv_tvshow)
+        rvMoviesList2.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        rvMoviesList2.setHasFixedSize(true)
 
         // Load the user's avatar
         loadUserAvatar()
@@ -60,15 +72,15 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
             startActivity(intent)
         }
 
-        // Testing new feature
+        // For the movie part
         val popularMoviesTextView = findViewById<TextView>(R.id.popularText)
-        val playingNowTextView = findViewById<TextView>(R.id.playingText)
+        val topRatedMoviesTextView = findViewById<TextView>(R.id.topMoviesText)
 
         popularMoviesTextView.setOnClickListener {
             saveUserChoice("Popular Movies")
             popularMoviesTextView.setTextColor(resources.getColor(R.color.yellow))
-            playingNowTextView.setTextColor(resources.getColor(R.color.greyText))
-            playingNowTextView.isEnabled = true
+            topRatedMoviesTextView.setTextColor(resources.getColor(R.color.greyText))
+            topRatedMoviesTextView.isEnabled = true
             popularMoviesTextView.isEnabled = false
 
             CoroutineScope(Dispatchers.Main).launch {
@@ -77,15 +89,15 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
             }
         }
 
-        playingNowTextView.setOnClickListener {
-            saveUserChoice("Playing Now")
-            playingNowTextView.setTextColor(resources.getColor(R.color.yellow))
+        topRatedMoviesTextView.setOnClickListener {
+            saveUserChoice("Top Rated Movies")
+            topRatedMoviesTextView.setTextColor(resources.getColor(R.color.yellow))
             popularMoviesTextView.setTextColor(resources.getColor(R.color.greyText))
             popularMoviesTextView.isEnabled = true
-            playingNowTextView.isEnabled = false
+            topRatedMoviesTextView.isEnabled = false
 
             CoroutineScope(Dispatchers.Main).launch {
-                val movies = getMovieData("Playing Now")
+                val movies = getMovieData("Top Rated Movies")
                 rvMoviesList.adapter = MovieAdapter(movies, this@MainActivity)
             }
         }
@@ -95,7 +107,45 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
         if (userChoice == "Popular Movies") {
             popularMoviesTextView.callOnClick()
         } else {
-            playingNowTextView.callOnClick()
+            topRatedMoviesTextView.callOnClick()
+        }
+
+        // For the Tv Show part
+        val popularTvTextView = findViewById<TextView>(R.id.popularTvshow)
+        val topRatedTvTextView = findViewById<TextView>(R.id.topRatedTvshow)
+
+        popularTvTextView.setOnClickListener {
+            saveUserChoiceTV("Popular TV Show")
+            popularTvTextView.setTextColor(resources.getColor(R.color.yellow))
+            topRatedTvTextView.setTextColor(resources.getColor(R.color.greyText))
+            topRatedTvTextView.isEnabled = true
+            popularTvTextView.isEnabled = false
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val tvShow = getTVData("Popular TV Show")
+                rvMoviesList2.adapter = TVShowAdapter(tvShow, this@MainActivity)
+            }
+        }
+
+        topRatedTvTextView.setOnClickListener {
+            saveUserChoiceTV("Top Rated TV Show")
+            topRatedTvTextView.setTextColor(resources.getColor(R.color.yellow))
+            popularTvTextView.setTextColor(resources.getColor(R.color.greyText))
+            popularTvTextView.isEnabled = true
+            topRatedTvTextView.isEnabled = false
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val tvShow = getTVData("Top Rated TV Show")
+                rvMoviesList2.adapter = TVShowAdapter(tvShow, this@MainActivity)
+            }
+        }
+
+        // Check user's choice and load data accordingly
+        val userChoiceTV = getUserChoiceTV()
+        if (userChoiceTV == "Popular TV Show") {
+            popularTvTextView.callOnClick()
+        } else {
+            topRatedTvTextView.callOnClick()
         }
 
         // Navbar
@@ -129,6 +179,13 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
         intent.putExtra("movie_id", movie.id)
 
         // Start the detail activity
+        startActivity(intent)
+    }
+
+    override fun onItemClick(tvShow: TVShow) {
+        val intent = Intent(this, DetailActivity::class.java)
+        intent.putExtra("tvshow", tvShow)
+        intent.putExtra("tv_id", tvShow.id)
         startActivity(intent)
     }
 
@@ -175,10 +232,10 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
                 movies.addAll(deferred2.await())
                 movies.addAll(deferred3.await())
             }
-            "Playing Now" -> {
+            "Top Rated Movies" -> {
                 val deferred1 = coroutineScope.async {
-                    val playingNowInterface1 = MovieApiService.getInstance().create(PlayingNowInterface1::class.java)
-                    val response1 = playingNowInterface1.getMovieList().execute()
+                    val topRatedMovieInterface1 = MovieApiService.getInstance().create(TopRatedMovieInterface1::class.java)
+                    val response1 = topRatedMovieInterface1.getMovieList().execute()
                     if (response1.isSuccessful) {
                         response1.body()?.movies ?: emptyList()
                     } else {
@@ -186,8 +243,8 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
                     }
                 }
                 val deferred2 = coroutineScope.async {
-                    val playingNowInterface2 = MovieApiService.getInstance().create(PlayingNowInterface2::class.java)
-                    val response2 = playingNowInterface2.getMovieList().execute()
+                    val topRatedMovieInterface2 = MovieApiService.getInstance().create(TopRatedMovieInterface2::class.java)
+                    val response2 = topRatedMovieInterface2.getMovieList().execute()
                     if (response2.isSuccessful){
                         response2.body()?.movies?: emptyList()
                     } else {
@@ -207,7 +264,72 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
         return movies
     }
 
+    private suspend fun getTVData(dataType: String): (List<TVShow>) {
+        val loadingProgressBar = findViewById<ProgressBar>(R.id.loadingTV)
+        // Show the progress bar
+        loadingProgressBar.visibility = View.VISIBLE
 
+        val tvShow = mutableListOf<TVShow>()
+
+        val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+        when (dataType) {
+            "Popular TV Show" -> {
+                val deferred1 = coroutineScope.async {
+                    val apiService1 = MovieApiService.getInstance().create(popularTVshowInterface1::class.java)
+                    val response1 = apiService1.getTVlist().execute()
+                    if (response1.isSuccessful) {
+                        response1.body()?.tvShows ?: emptyList()
+                    } else {
+                        emptyList()
+                    }
+                }
+
+                val deferred2 = coroutineScope.async {
+                    val apiService2 = MovieApiService.getInstance().create(popularTVshowInterface2::class.java)
+                    val response2 = apiService2.getTVlist().execute()
+                    if (response2.isSuccessful) {
+                        response2.body()?.tvShows ?: emptyList()
+                    } else {
+                        emptyList()
+                    }
+                }
+                // Wait for all deferred tasks to finish
+                tvShow.addAll(deferred1.await())
+                tvShow.addAll(deferred2.await())
+            }
+            "Top Rated TV Show" -> {
+                val deferred1 = coroutineScope.async {
+                    val topRatedTVshow = MovieApiService.getInstance().create(topRatedTVshowInterface1::class.java)
+                    val response1 = topRatedTVshow.getTVlist().execute()
+                    if (response1.isSuccessful) {
+                        response1.body()?.tvShows ?: emptyList()
+                    } else {
+                        emptyList()
+                    }
+                }
+                val deferred2 = coroutineScope.async {
+                    val topRatedTVshow2 = MovieApiService.getInstance().create(topRatedTVshowInterface2::class.java)
+                    val response2 = topRatedTVshow2.getTVlist().execute()
+                    if (response2.isSuccessful) {
+                        response2.body()?.tvShows ?: emptyList()
+                    } else {
+                        emptyList()
+                    }
+                }
+
+                // Wait for all deferred tasks to finish
+                tvShow.addAll(deferred1.await())
+                tvShow.addAll(deferred2.await())
+            }
+            else -> throw IllegalArgumentException("Invalid Data Type")
+        }
+        // Switch to the main thread to update the UI
+        withContext(Dispatchers.Main) {
+            loadingProgressBar.visibility = View.GONE
+        }
+        return tvShow
+    }
 
     // After users presses on the sign out button, they won't be able to edit data
     private fun logoutUser() {
@@ -227,9 +349,20 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener{
         editor.apply()
     }
 
+    private fun saveUserChoiceTV(choice: String) {
+        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("userChoiceTV", choice)
+        editor.apply()
+    }
     private fun getUserChoice(): String? {
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         return sharedPreferences.getString("userChoice", null)
+    }
+
+    private fun getUserChoiceTV(): String? {
+        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
+        return sharedPreferences.getString("userChoiceTV", null)
     }
 
     private fun loadUserAvatar() {

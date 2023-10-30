@@ -5,7 +5,6 @@ import android.graphics.Paint
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -18,6 +17,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.WindowCompat
 import com.bumptech.glide.Glide
 import com.example.mycustomapp.models.Movie
+import com.example.mycustomapp.models.TVShow
 import com.example.mycustomapp.models.WatchlistItem
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -44,11 +44,17 @@ class DetailActivity : AppCompatActivity() {
         // Retrieve the movie_id for each movie users clicked
         val movieId = intent.getIntExtra("movie_id", 0)
 
+        // Retrieve the TV Show details from the intent
+        val tvshow = intent.getParcelableExtra<TVShow>("tvshow")
+        val tvshowId = intent.getIntExtra("tvshow_id", 0)
+
+
         // Used log to check if its passing the right id, turns out i passed a string instead of int,
         // that's why the watch trailer isn't working
         // Log.i("movie_id", "Movie id: $movieId")
 
         populateUI(movie)
+        populateUI(tvshow)
 
         val backButton = findViewById<ImageView>(R.id.back)
         backButton.setOnClickListener {
@@ -202,6 +208,29 @@ class DetailActivity : AppCompatActivity() {
             val IMAGE_BASE = "https://image.tmdb.org/t/p/w500/"
             Glide.with(this).load(IMAGE_BASE + movie.poster).into(posterNormalImg)
             Glide.with(this).load(IMAGE_BASE + movie.poster).into(posterBigImg)
+        }
+    }
+    private fun populateUI(tvShow: TVShow?) {
+        // Check if the tv show object is not null
+        if (tvShow != null) {
+            val movieNameTxt = findViewById<TextView>(R.id.movieNameTxt)
+            val movieRateTxt = findViewById<TextView>(R.id.movieRateTxt)
+            val movieDateTxt = findViewById<TextView>(R.id.movieDateTxt)
+            val posterNormalImg = findViewById<ImageView>(R.id.posterNormalImg)
+            val posterBigImg = findViewById<ImageView>(R.id.posterBigImg)
+            val movieDetail = findViewById<TextView>(R.id.movieDetailInfo)
+            val numbers = findViewById<TextView>(R.id.movieTimeTxt)
+
+            movieNameTxt.text = tvShow.name
+            movieRateTxt.text = tvShow.vote
+            movieDateTxt.text = tvShow.date
+            movieDetail.text = tvShow.detail
+            numbers.text = tvShow.numbers
+
+            // Load the movie poster image using Glide
+            val IMAGE_BASE = "https://image.tmdb.org/t/p/w500/"
+            Glide.with(this).load(IMAGE_BASE + tvShow.poster).into(posterNormalImg)
+            Glide.with(this).load(IMAGE_BASE + tvShow.poster).into(posterBigImg)
         }
     }
 }

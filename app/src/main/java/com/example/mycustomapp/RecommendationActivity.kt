@@ -2,17 +2,20 @@ package com.example.mycustomapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mycustomapp.adapters.MovieAdapter
 import com.example.mycustomapp.models.Movie
+import com.example.mycustomapp.services.PlayingNowMovies
 import com.example.mycustomapp.services.RecommendationMovie
-import com.example.mycustomapp.services.TopRatedMovie
 import com.example.mycustomapp.services.UpcomingMovie
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -20,8 +23,16 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 import kotlin.coroutines.CoroutineContext
 
 class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, CoroutineScope {
@@ -46,15 +57,79 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-
         // Fetch and populate recommended movies
         fetchRecommendedMovies()
 
         // Fetch and populate Top Rated movies
-        fetchTopRatedMovies()
+        fetchPlayingNowMovies()
 
         // Fetch and populate Upcoming movies
         fetchUpcomingMovies()
+
+        // Search bar
+        val searchContainer = findViewById<LinearLayout>(R.id.searchContainer)
+        val searchView = findViewById<SearchView>(R.id.searchView)
+
+        searchContainer.setOnClickListener {
+            // Programmatically expand the SearchView when the container is clicked
+            searchView.isIconified = false
+        }
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (!query.isNullOrBlank()) {
+                    // Clear focus to hide the keyboard
+                    searchView.clearFocus()
+
+                    // Perform the movie search
+                    performMovieSearch(query)
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
+    }
+
+    private fun performMovieSearch(query: String) {
+        val apiKey = "381e5879afdcdcba913bc1f839a6f004"
+        val baseUrl = "https://api.themoviedb.org/3/search/multi"
+
+        val client = OkHttpClient()
+
+        val url = HttpUrl.parse(baseUrl)?.newBuilder()
+            ?.addQueryParameter("api_key", apiKey)
+            ?.addQueryParameter("query", query)
+            ?.build()
+
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                // Handle network request failure
+                Log.e("NetworkRequest", "Request failed: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()?.string()
+                    Log.d("NetworkRequest", "Response successful. Body: $responseBody")
+                    val json = JSONObject(responseBody)
+
+                    // Process the JSON response
+                    val results = json.getJSONArray("results")
+                    // Handle the results as needed
+
+                } else {
+                    // Handle non successful response
+                    Log.e("NetworkRequest", "Response not successful. Code: ${response.code()}")
+                }
+            }
+        })
     }
 
     override fun onItemClick(movie: Movie) {
@@ -69,6 +144,7 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
         // Start the detail activity
         startActivity(intent)
     }
+
     private fun fetchRecommendedMovies() {
         val apiKey = "381e5879afdcdcba913bc1f839a6f004"
         val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -149,39 +225,39 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
             return recommendedMovies
         }
 
-    private fun fetchTopRatedMovies() {
+    private fun fetchPlayingNowMovies() {
             val apiKey = "381e5879afdcdcba913bc1f839a6f004"
-            val progressBar = findViewById<ProgressBar>(R.id.progressTopRated)
+            val progressBar = findViewById<ProgressBar>(R.id.progressPlayingNow)
 
             launch {
                 progressBar.visibility = View.VISIBLE
 
-                val topRatedMovies = fetchTopRatedMovies(apiKey)
+                val nowPlayingMovies = fetchPlayingNowMovies(apiKey)
 
-                if (topRatedMovies.isNotEmpty()) {
-                    val topRatedRecyclerView = findViewById<RecyclerView>(R.id.topratedRV)
+                if (nowPlayingMovies.isNotEmpty()) {
+                    val playingNowRecyclerView = findViewById<RecyclerView>(R.id.playingNowRV)
 
-                    topRatedRecyclerView.layoutManager = LinearLayoutManager(this@RecommendationActivity, LinearLayoutManager.HORIZONTAL, false)
-                    topRatedRecyclerView.adapter = MovieAdapter(topRatedMovies, this@RecommendationActivity)
+                    playingNowRecyclerView.layoutManager = LinearLayoutManager(this@RecommendationActivity, LinearLayoutManager.HORIZONTAL, false)
+                    playingNowRecyclerView.adapter = MovieAdapter(nowPlayingMovies, this@RecommendationActivity)
                     progressBar.visibility = View.GONE
                 }
             }
         }
 
-    private suspend fun fetchTopRatedMovies(apiKey: String): List<Movie> {
+    private suspend fun fetchPlayingNowMovies(apiKey: String): List<Movie> {
             val retrofit = Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org/3/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 
-            val apiService = retrofit.create(TopRatedMovie::class.java)
+            val apiService = retrofit.create(PlayingNowMovies::class.java)
 
-            val topRatedMovieResponse = withContext(Dispatchers.IO) {
-                apiService.getTopRatedMovies(apiKey).execute()
+            val playingNowMoviesResponse = withContext(Dispatchers.IO) {
+                apiService.getNowPlayingMovies(apiKey).execute()
             }
 
-            return if (topRatedMovieResponse.isSuccessful) {
-                topRatedMovieResponse.body()?.movies ?: emptyList()
+            return if (playingNowMoviesResponse.isSuccessful) {
+                playingNowMoviesResponse.body()?.movies ?: emptyList()
             } else {
                 emptyList()
             }

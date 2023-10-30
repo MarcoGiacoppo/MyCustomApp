@@ -9,7 +9,11 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -20,23 +24,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="85dp">
 
-                <TextView
-                    android:id="@+id/mainTitle"
+                <LinearLayout
+                    android:id="@+id/searchContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/title"
-                    android:shadowColor="#FF0000"
-                    android:shadowDx="5"
-                    android:shadowDy="5"
-                    android:shadowRadius="10"
-                    android:text="      Explore More"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/white"
-                    android:textSize="25sp"
-                    android:textStyle="italic"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginEnd="24dp"
+                    android:clickable="true"
+                    android:focusable="true"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.SearchView
+                        android:id="@+id/searchView"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:background="@drawable/rounded_search"
+                        android:theme="@style/CustomSearchView"
+                        app:queryHint="Movies, shows, and more...">
+
+                    </androidx.appcompat.widget.SearchView>
+                </LinearLayout>
 
                 <ImageView
                     android:id="@+id/back"
@@ -46,9 +56,9 @@
                     android:background="@drawable/bg_circle_dark"
                     android:padding="8dp"
                     android:src="@drawable/ic_round_arrow_back_24"
-                    app:layout_constraintBottom_toBottomOf="@+id/mainTitle"
+                    app:layout_constraintBottom_toBottomOf="@+id/searchContainer"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/mainTitle"
+                    app:layout_constraintTop_toTopOf="@+id/searchContainer"
                     app:tint="@color/white" />
 
                 <View
@@ -116,14 +126,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:fontFamily="@font/text"
-                    android:text="Top Rated"
+                    android:text="Playing Now"
                     android:textColor="#ffc107"
                     android:textSize="21sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/topratedRV"
+                    android:id="@+id/playingNowRV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="12dp"
@@ -135,14 +145,14 @@
                     app:layout_constraintTop_toBottomOf="@+id/topRatedTextView" />
 
                 <ProgressBar
-                    android:id="@+id/progressTopRated"
+                    android:id="@+id/progressPlayingNow"
                     style="?android:attr/progressBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/topratedRV"
+                    app:layout_constraintBottom_toBottomOf="@+id/playingNowRV"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/topratedRV"
+                    app:layout_constraintStart_toStartOf="@+id/playingNowRV"
                     app:layout_constraintTop_toBottomOf="@+id/topRatedTextView"
                     tools:visibility="visible" />
             </androidx.constraintlayout.widget.ConstraintLayout>

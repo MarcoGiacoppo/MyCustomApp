@@ -8,7 +8,7 @@
     android:background="#2f2f39">
 
     <ImageView
-        android:id="@+id/moviePoster"
+        android:id="@+id/tvshowPoster"
         android:layout_width="120dp"
         android:layout_height="180dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -17,7 +17,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/movieTitle"
+        android:id="@+id/tvshowName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -29,9 +29,9 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="@+id/moviePoster"
-        app:layout_constraintStart_toStartOf="@+id/moviePoster"
-        app:layout_constraintTop_toBottomOf="@+id/moviePoster" />
+        app:layout_constraintEnd_toEndOf="@+id/tvshowPoster"
+        app:layout_constraintStart_toStartOf="@+id/tvshowPoster"
+        app:layout_constraintTop_toBottomOf="@+id/tvshowPoster" />
 
     <ImageView
         android:id="@+id/imageView6"
@@ -40,13 +40,13 @@
         android:layout_marginTop="4dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/movieTitle"
-        app:layout_constraintTop_toBottomOf="@+id/movieTitle"
+        app:layout_constraintStart_toStartOf="@+id/tvshowName"
+        app:layout_constraintTop_toBottomOf="@+id/tvshowName"
         app:srcCompat="@drawable/ic_round_star_24"
         app:tint="#CC4121" />
 
     <TextView
-        android:id="@+id/movieRating"
+        android:id="@+id/tvshowRating"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -55,7 +55,7 @@
         android:textColor="@color/white"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/movieTitle"
+        app:layout_constraintEnd_toEndOf="@+id/tvshowName"
         app:layout_constraintStart_toEndOf="@+id/imageView6"
-        app:layout_constraintTop_toBottomOf="@+id/movieTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tvshowName" />
 </androidx.constraintlayout.widget.ConstraintLayout>

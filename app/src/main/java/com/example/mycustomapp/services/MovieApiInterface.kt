@@ -2,10 +2,12 @@ package com.example.mycustomapp.services
 
 import com.example.mycustomapp.models.Movie
 import com.example.mycustomapp.models.MovieResponse
+import com.example.mycustomapp.models.TVShowResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.nio.channels.CancelledKeyException
 
 // API request for Popular movies
 
@@ -21,27 +23,51 @@ interface MovieApiInterface2 {
     fun getMovieList(): Call<MovieResponse>
 }
 
+// API Request for 3rd page
 interface MovieApiInterface3 {
     @GET("/3/movie/popular?api_key=381e5879afdcdcba913bc1f839a6f004&page=3")
     fun getMovieList(): Call<MovieResponse>
 }
 
-// API Service for Playing Now movies
+// Interface for Top Rated movies
 // Page 1
-interface PlayingNowInterface1 {
-    @GET("/3/movie/now_playing?api_key=381e5879afdcdcba913bc1f839a6f004&page=1")
+interface TopRatedMovieInterface1 {
+    @GET("/3/movie/top_rated?api_key=381e5879afdcdcba913bc1f839a6f004&page=1")
     fun getMovieList(): Call<MovieResponse>
 }
+
 // Page 2
-interface PlayingNowInterface2 {
-    @GET("/3/movie/now_playing?api_key=381e5879afdcdcba913bc1f839a6f004&page=2")
+interface TopRatedMovieInterface2 {
+    @GET("/3/movie/top_rated?api_key=381e5879afdcdcba913bc1f839a6f004&page=2")
     fun getMovieList(): Call<MovieResponse>
 }
-//Page 3
-interface PlayingNowInterface3 {
-    @GET("/3/movie/now_playing?api_key=381e5879afdcdcba913bc1f839a6f004&page=3")
-    fun getMovieList(): Call<MovieResponse>
+
+// Interface for popular TV Shows
+// Page 1
+interface popularTVshowInterface1 {
+    @GET("/3/tv/popular?api_key=381e5879afdcdcba913bc1f839a6f004&page=1")
+    fun getTVlist(): Call<TVShowResponse>
 }
+
+// Page 2
+interface popularTVshowInterface2 {
+    @GET("/3/tv/popular?api_key=381e5879afdcdcba913bc1f839a6f004&page=2")
+    fun getTVlist(): Call<TVShowResponse>
+}
+
+// Interface for Top Rated TV Show
+// Page 1
+interface topRatedTVshowInterface1 {
+    @GET("/3/tv/top_rated?api_key=381e5879afdcdcba913bc1f839a6f004&page=1")
+    fun getTVlist(): Call<TVShowResponse>
+}
+
+// Page 2
+interface topRatedTVshowInterface2 {
+    @GET("/3/tv/top_rated?api_key=381e5879afdcdcba913bc1f839a6f004&page=2")
+    fun getTVlist(): Call<TVShowResponse>
+}
+
 
 // Interface for recommended movies
 interface RecommendationMovie {
@@ -52,10 +78,11 @@ interface RecommendationMovie {
     ): Call<MovieResponse>
 }
 
-// Interface for Top Rated movies
-interface TopRatedMovie {
-    @GET("movie/top_rated")
-    fun getTopRatedMovies(
+// API Service for Playing Now movies
+// Page 1
+interface PlayingNowMovies {
+    @GET("movie/now_playing")
+    fun getNowPlayingMovies(
         @Query("api_key") apiKey: String
     ): Call<MovieResponse>
 }

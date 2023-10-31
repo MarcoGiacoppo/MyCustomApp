@@ -39,7 +39,7 @@ import kotlinx.coroutines.withContext
 class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVShowAdapter.OnItemClickListener{
 
     private lateinit var rvMoviesList: RecyclerView
-    private lateinit var rvMoviesList2: RecyclerView
+    private lateinit var rvTvShow: RecyclerView
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,9 +51,9 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
         rvMoviesList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         rvMoviesList.setHasFixedSize(true)
 
-        rvMoviesList2 = findViewById(R.id.rv_tvshow)
-        rvMoviesList2.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        rvMoviesList2.setHasFixedSize(true)
+        rvTvShow = findViewById(R.id.rv_tvshow)
+        rvTvShow.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        rvTvShow.setHasFixedSize(true)
 
         // Load the user's avatar
         loadUserAvatar()
@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
 
             CoroutineScope(Dispatchers.Main).launch {
                 val tvShow = getTVData("Popular TV Show")
-                rvMoviesList2.adapter = TVShowAdapter(tvShow, this@MainActivity)
+                rvTvShow.adapter = TVShowAdapter(tvShow, this@MainActivity)
             }
         }
 
@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
 
             CoroutineScope(Dispatchers.Main).launch {
                 val tvShow = getTVData("Top Rated TV Show")
-                rvMoviesList2.adapter = TVShowAdapter(tvShow, this@MainActivity)
+                rvTvShow.adapter = TVShowAdapter(tvShow, this@MainActivity)
             }
         }
 
@@ -159,7 +159,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
         }
 
         movieButton.setOnClickListener {
-            val intent = Intent(this, RecommendationActivity::class.java)
+            val intent = Intent(this, DiscoverActivity::class.java)
             startActivity(intent)
         }
 
@@ -173,6 +173,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
         // Create an intent to open the DetailActivity
         val intent = Intent(this, DetailActivity::class.java)
 
+        intent.putExtra("source", "main")
         // Pass the selected movie's details to the DetailActivity
         intent.putExtra("movie", movie)
         // Pass the movie_id to be put inside another API and watch the trailer
@@ -348,18 +349,17 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
         editor.putString("userChoice", choice)
         editor.apply()
     }
-
     private fun saveUserChoiceTV(choice: String) {
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putString("userChoiceTV", choice)
         editor.apply()
     }
+
     private fun getUserChoice(): String? {
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         return sharedPreferences.getString("userChoice", null)
     }
-
     private fun getUserChoiceTV(): String? {
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         return sharedPreferences.getString("userChoiceTV", null)

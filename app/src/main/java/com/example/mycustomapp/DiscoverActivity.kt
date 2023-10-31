@@ -7,12 +7,15 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mycustomapp.adapters.MovieAdapter
+import com.example.mycustomapp.adapters.SearchResultsAdapter
 import com.example.mycustomapp.models.Movie
 import com.example.mycustomapp.services.PlayingNowMovies
 import com.example.mycustomapp.services.RecommendationMovie
@@ -35,20 +38,47 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import kotlin.coroutines.CoroutineContext
 
-class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, CoroutineScope {
+class DiscoverActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, CoroutineScope {
 
     private lateinit var rvRecommendedMovies: RecyclerView
+    private lateinit var playingNowRecyclerView: RecyclerView
+    private lateinit var upcomingRecyclerView: RecyclerView
+    private lateinit var recommendationTextView: TextView
+    private lateinit var playingNowTextView: TextView
+    private lateinit var upcomingMovieTextView: TextView
     private lateinit var job: Job
+
+    private val searchResultsList = mutableListOf<Movie>()
+    private val searchResultsAdapter = SearchResultsAdapter(searchResultsList, object : SearchResultsAdapter.OnItemClickListener {
+        override fun onItemClick(movie: Movie) {
+            // Handle item click (if needed)
+            val intent = Intent(this@DiscoverActivity, DetailActivity::class.java)
+            intent.putExtra("movie", movie)
+            intent.putExtra("movie_id", movie.id)
+            intent.putExtra("source", "recommendation")
+            startActivity(intent)
+        }
+    })
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_recommendation)
+        setContentView(R.layout.activity_discover)
+
+        recommendationTextView = findViewById(R.id.recommendationTextView)
+        playingNowTextView = findViewById(R.id.playingNowTextView)
+        upcomingMovieTextView = findViewById(R.id.upcomingTextView)
 
         rvRecommendedMovies = findViewById(R.id.recommendationRV)
         rvRecommendedMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        playingNowRecyclerView = findViewById(R.id.playingNowRV)
+        playingNowRecyclerView.layoutManager = LinearLayoutManager(this@DiscoverActivity, LinearLayoutManager.HORIZONTAL, false)
+
+        upcomingRecyclerView = findViewById(R.id.upcomingRV)
+        upcomingRecyclerView.layoutManager = LinearLayoutManager(this@DiscoverActivity, LinearLayoutManager.HORIZONTAL, false)
 
         job = Job()
 
@@ -122,13 +152,53 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
 
                     // Process the JSON response
                     val results = json.getJSONArray("results")
-                    // Handle the results as needed
 
+                    // Create a list of Movie objects from the JSON results
+                    val searchResults = mutableListOf<Movie>()
+                    for (i in 0 until results.length()) {
+                        val result = results.getJSONObject(i)
+                        val mediaType = result.optString("media_type")
+
+                        // Check if the result is a movie or TV show
+                        if (mediaType == "movie" || mediaType == "tv") {
+                            val title = result.optString("title")
+                            val overview = result.optString("overview")
+                            val posterPath = result.optString("poster_path")
+                            val id = result.optInt("id")
+                            val vote = result.optString("vote_average")
+                            val date = result.optString("release_date")
+                            val numbers = result.optString("vote_count")
+
+                            // Create a Movie object and add it to the searchResults list
+                            val movie = Movie(id, title, posterPath, vote, date, overview, numbers)
+                            searchResults.add(movie)
+                        }
+                    }
+
+                    // Update the UI with the search results
+                    runOnUiThread {
+                        // Hide existing RecyclerViews
+                        rvRecommendedMovies.visibility = View.GONE
+                        playingNowRecyclerView.visibility = View.GONE
+                        upcomingRecyclerView.visibility = View.GONE
+                        recommendationTextView.visibility = View.GONE
+                        playingNowTextView.visibility = View.GONE
+                        upcomingMovieTextView.visibility = View.GONE
+
+                        // Show the new RecyclerView
+                        val searchResultsRecyclerView = findViewById<RecyclerView>(R.id.searchResultsRV)
+                        searchResultsRecyclerView.layoutManager = GridLayoutManager(this@DiscoverActivity, 3)
+                        searchResultsRecyclerView.adapter = searchResultsAdapter
+                        searchResultsList.clear()
+                        searchResultsList.addAll(searchResults)
+                        searchResultsAdapter.notifyDataSetChanged()
+                    }
                 } else {
-                    // Handle non successful response
+                    // Handle non-successful response
                     Log.e("NetworkRequest", "Response not successful. Code: ${response.code()}")
                 }
             }
+
         })
     }
 
@@ -140,6 +210,8 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
         intent.putExtra("movie", movie)
         // Pass the movie_id to be put inside another API and watch the trailer
         intent.putExtra("movie_id", movie.id)
+        // To go back to rec activity
+        intent.putExtra("source", "recommendation")
 
         // Start the detail activity
         startActivity(intent)
@@ -176,7 +248,7 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
                         progressBar.visibility = View.VISIBLE
                         // Show a Toast message if there are no 5-star ratings
                         Toast.makeText(
-                            this@RecommendationActivity,
+                            this@DiscoverActivity,
                             "You need to have at least one 5-star rating to get recommendations.",
                             Toast.LENGTH_LONG
                         ).show()
@@ -186,7 +258,7 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
                             val recommendedMovies =
                                 fetchRecommendations(recommendedMovieIds, apiKey)
                             rvRecommendedMovies.adapter =
-                                MovieAdapter(recommendedMovies, this@RecommendationActivity)
+                                MovieAdapter(recommendedMovies, this@DiscoverActivity)
                             rvRecommendedMovies.adapter?.notifyDataSetChanged()
 
                             progressBar.visibility = View.GONE
@@ -200,7 +272,6 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
             })
         }
     }
-
     private suspend fun fetchRecommendations(movieIds: List<Int>, apiKey: String): List<Movie> {
             val retrofit = Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org/3/")
@@ -231,19 +302,15 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
 
             launch {
                 progressBar.visibility = View.VISIBLE
-
                 val nowPlayingMovies = fetchPlayingNowMovies(apiKey)
 
                 if (nowPlayingMovies.isNotEmpty()) {
-                    val playingNowRecyclerView = findViewById<RecyclerView>(R.id.playingNowRV)
-
-                    playingNowRecyclerView.layoutManager = LinearLayoutManager(this@RecommendationActivity, LinearLayoutManager.HORIZONTAL, false)
-                    playingNowRecyclerView.adapter = MovieAdapter(nowPlayingMovies, this@RecommendationActivity)
+                    playingNowRecyclerView.adapter =
+                        MovieAdapter(nowPlayingMovies, this@DiscoverActivity)
                     progressBar.visibility = View.GONE
                 }
             }
         }
-
     private suspend fun fetchPlayingNowMovies(apiKey: String): List<Movie> {
             val retrofit = Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org/3/")
@@ -273,15 +340,12 @@ class RecommendationActivity : AppCompatActivity(), MovieAdapter.OnItemClickList
             val upcomingMovies = fetchUpcomingMovies(apiKey)
 
             if (upcomingMovies.isNotEmpty()) {
-                val upcomingRecyclerView = findViewById<RecyclerView>(R.id.upcomingRV)
-
-                upcomingRecyclerView.layoutManager = LinearLayoutManager(this@RecommendationActivity, LinearLayoutManager.HORIZONTAL, false)
-                upcomingRecyclerView.adapter = MovieAdapter(upcomingMovies, this@RecommendationActivity)
+                upcomingRecyclerView.adapter =
+                    MovieAdapter(upcomingMovies, this@DiscoverActivity)
                 progressBar.visibility = View.GONE
             }
         }
     }
-
     private suspend fun fetchUpcomingMovies(apiKey: String): List<Movie> {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.themoviedb.org/3/")

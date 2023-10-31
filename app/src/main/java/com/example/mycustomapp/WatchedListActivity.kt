@@ -75,7 +75,7 @@ class WatchedListActivity : AppCompatActivity(),
         }
 
         movieButton.setOnClickListener {
-            val intent = Intent(this, RecommendationActivity::class.java)
+            val intent = Intent(this, DiscoverActivity::class.java)
             startActivity(intent)
         }
 

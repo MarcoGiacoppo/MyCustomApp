@@ -46,8 +46,7 @@ class DetailActivity : AppCompatActivity() {
 
         // Retrieve the TV Show details from the intent
         val tvshow = intent.getParcelableExtra<TVShow>("tvshow")
-        val tvshowId = intent.getIntExtra("tvshow_id", 0)
-
+        val tvshowId = intent.getIntExtra("tv_id", 0)
 
         // Used log to check if its passing the right id, turns out i passed a string instead of int,
         // that's why the watch trailer isn't working
@@ -57,9 +56,25 @@ class DetailActivity : AppCompatActivity() {
         populateUI(tvshow)
 
         val backButton = findViewById<ImageView>(R.id.back)
+
+        val source = intent.getStringExtra("source")
+
         backButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            when (source) {
+                "recommendation" -> {
+                    val intent = Intent(this, DiscoverActivity::class.java)
+                    startActivity(intent)
+                }
+                "main" -> {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                }
+                else -> {
+                    // Default behavior, e.g., go back to MainActivity
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                }
+            }
         }
 
         val watchTrailer = findViewById<TextView>(R.id.trailer)
@@ -70,13 +85,18 @@ class DetailActivity : AppCompatActivity() {
         loadingIndicator.text = "Fetching trailer..."
 
         GlobalScope.launch(Dispatchers.IO) {
-            val youTubekey = fetchYouTubeKey(movieId)
+            val movieYouTubeKey = fetchYouTubeKey(movieId, "movie")
+            val tvShowYouTubeKey = fetchYouTubeKey(tvshowId, "tvshow")
+
             withContext(Dispatchers.Main) {
-                watchTrailer.tag = youTubekey
-                watchTrailer.isEnabled = youTubekey != null
+                if (movieYouTubeKey != null || tvShowYouTubeKey != null) {
+                    watchTrailer.tag = movieYouTubeKey ?: tvShowYouTubeKey
+                    watchTrailer.isEnabled = true
+                }
                 loadingIndicator.visibility = View.GONE
             }
         }
+
         // Set an OnClickListener to open the YouTube video when the "Watch Trailer" TextView is clicked
         watchTrailer.setOnClickListener {
             val youTubeKey = watchTrailer.tag as? String
@@ -157,9 +177,15 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun fetchYouTubeKey(movieId: Int): String? {
+    private suspend fun fetchYouTubeKey(Id: Int, type: String): String? {
         val apiKey = "381e5879afdcdcba913bc1f839a6f004"
-        val url = "https://api.themoviedb.org/3/movie/$movieId/videos?api_key=$apiKey"
+        val baseUrl = when (type) {
+            "movie" -> "https://api.themoviedb.org/3/movie/"
+            "tvshow" -> "https://api.themoviedb.org/3/tv/"
+            else -> return null
+        }
+
+        val url = "$baseUrl$Id/videos?api_key=$apiKey"
 
         return withContext(Dispatchers.IO) {
             val client = OkHttpClient()
@@ -210,6 +236,7 @@ class DetailActivity : AppCompatActivity() {
             Glide.with(this).load(IMAGE_BASE + movie.poster).into(posterBigImg)
         }
     }
+    // For TV Show details
     private fun populateUI(tvShow: TVShow?) {
         // Check if the tv show object is not null
         if (tvShow != null) {

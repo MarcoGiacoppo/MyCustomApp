@@ -95,11 +95,3 @@ interface UpcomingMovie {
     ): Call<MovieResponse>
 }
 
-// Interface for search queries
-interface MovieSearchService {
-    @GET("search/movie")
-    suspend fun searchMovies(
-        @Query("api_key") apiKey: String,
-        @Query("query") query: String
-    ): Call<MovieResponse>
-}

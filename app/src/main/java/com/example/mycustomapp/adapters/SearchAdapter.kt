@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.mycustomapp.databinding.SearchResultItemBinding
+import com.example.mycustomapp.databinding.MovieItemBinding
 import com.example.mycustomapp.models.Movie
 
 class SearchResultsAdapter(
@@ -13,13 +13,13 @@ class SearchResultsAdapter(
 ) : RecyclerView.Adapter<SearchResultsAdapter.ResultViewHolder>() {
 
     // ViewHolder class for individual movie items
-    inner class ResultViewHolder(private val binding: SearchResultItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ResultViewHolder(private val binding: MovieItemBinding) : RecyclerView.ViewHolder(binding.root) {
         private val IMAGE_BASE = "https://image.tmdb.org/t/p/w500/"
 
         // Bind movie data to the ViewHolder
         fun bindResult(result: Movie) {
             // Load movie poster image using Glide library
-            Glide.with(binding.root).load(IMAGE_BASE + result.poster).into(binding.searchPoster)
+            Glide.with(binding.root).load(IMAGE_BASE + result.poster).into(binding.moviePoster)
         }
     }
 
@@ -30,7 +30,7 @@ class SearchResultsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultViewHolder {
         // Inflate the layout for an individual movie item using the binding
-        val binding = SearchResultItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = MovieItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ResultViewHolder(binding)
     }
 

@@ -41,40 +41,32 @@ class DetailActivity : AppCompatActivity() {
 
         // Retrieve the movie details from the Intent extras
         val movie = intent.getParcelableExtra<Movie>("movie")
-        // Retrieve the movie_id for each movie users clicked
         val movieId = intent.getIntExtra("movie_id", 0)
 
         // Retrieve the TV Show details from the intent
-        val tvshow = intent.getParcelableExtra<TVShow>("tvshow")
-        val tvshowId = intent.getIntExtra("tv_id", 0)
+        val tvShow = intent.getParcelableExtra<TVShow>("tvShow")
+        val tvShowId = intent.getIntExtra("tv_id", 0)
 
-        // Used log to check if its passing the right id, turns out i passed a string instead of int,
-        // that's why the watch trailer isn't working
-        // Log.i("movie_id", "Movie id: $movieId")
+        val searchQuery = intent.getStringExtra("search_query")
 
         populateUI(movie)
-        populateUI(tvshow)
+        populateUI(tvShow)
 
         val backButton = findViewById<ImageView>(R.id.back)
-
         val source = intent.getStringExtra("source")
 
         backButton.setOnClickListener {
-            when (source) {
-                "recommendation" -> {
-                    val intent = Intent(this, DiscoverActivity::class.java)
-                    startActivity(intent)
-                }
-                "main" -> {
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                }
-                else -> {
-                    // Default behavior, e.g., go back to MainActivity
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                }
+            val intent = when (source) {
+                "recommendation" -> Intent(this, DiscoverActivity::class.java)
+                "main" -> Intent(this, MainActivity::class.java)
+                else -> Intent(this, MainActivity::class.java)
             }
+
+            // Include the search query if available
+            if (searchQuery != null) {
+                intent.putExtra("search_query", searchQuery)
+            }
+            startActivity(intent)
         }
 
         val watchTrailer = findViewById<TextView>(R.id.trailer)
@@ -86,12 +78,16 @@ class DetailActivity : AppCompatActivity() {
 
         GlobalScope.launch(Dispatchers.IO) {
             val movieYouTubeKey = fetchYouTubeKey(movieId, "movie")
-            val tvShowYouTubeKey = fetchYouTubeKey(tvshowId, "tvshow")
+            val tvShowYouTubeKey = fetchYouTubeKey(tvShowId, "tvShow")
 
             withContext(Dispatchers.Main) {
                 if (movieYouTubeKey != null || tvShowYouTubeKey != null) {
                     watchTrailer.tag = movieYouTubeKey ?: tvShowYouTubeKey
                     watchTrailer.isEnabled = true
+                } else {
+                    watchTrailer.text = "Official Trailer Not Available"
+                    watchTrailer.isEnabled = false
+                    watchTrailer.setTextColor(resources.getColor(R.color.greyText))
                 }
                 loadingIndicator.visibility = View.GONE
             }
@@ -151,14 +147,7 @@ class DetailActivity : AppCompatActivity() {
                             // Save the review to Firebase
                             reviewKey?.let { key ->
                                 val newReview = WatchlistItem(
-                                    key,
-                                    userId,
-                                    movie.title ?: "",
-                                    rating,
-                                    review,
-                                    movie.poster,
-                                    movieId
-                                )
+                                    key, userId, movie.title ?: "", rating, review, movie.poster, movieId)
                                 movieReference.child(key).setValue(newReview)
                                 alertDialog.dismiss()
 
@@ -181,7 +170,7 @@ class DetailActivity : AppCompatActivity() {
         val apiKey = "381e5879afdcdcba913bc1f839a6f004"
         val baseUrl = when (type) {
             "movie" -> "https://api.themoviedb.org/3/movie/"
-            "tvshow" -> "https://api.themoviedb.org/3/tv/"
+            "tvShow" -> "https://api.themoviedb.org/3/tv/"
             else -> return null
         }
 
@@ -209,8 +198,6 @@ class DetailActivity : AppCompatActivity() {
             return@withContext null
         }
     }
-
-
 
     // For movie details
     private fun populateUI(movie: Movie?) {

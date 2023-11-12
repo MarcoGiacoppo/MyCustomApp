@@ -67,17 +67,23 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 // Send a password reset email to user's email address
                 auth.sendPasswordResetEmail(email)
-                    .addOnCompleteListener{task ->
-                        if (task.isSuccessful){
-                            Toast.makeText(this, "Password reset email sent. Check your email inbox.", Toast.LENGTH_SHORT).show()
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(
+                                this,
+                                "Password reset email sent. Check your email inbox.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } else {
-                            Toast.makeText(this, "Failed to send password reset email.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this,
+                                "Failed to send password reset email.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
             }
         }
-
-
         val registerNowText = findViewById<TextView>(R.id.registerNowTxt)
         registerNowText.paintFlags = Paint.UNDERLINE_TEXT_FLAG
 

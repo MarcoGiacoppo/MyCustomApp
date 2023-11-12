@@ -30,27 +30,6 @@ data class Movie(
 ) : Parcelable{
     constructor() : this(null,"","","","","","")
 }
-
-data class WatchlistItem(
-    var key: String?, // Field to store the Firebase-generated key
-    var userId: String?,
-    val movieTitle: String,
-    val userRating: Float,
-    val userReview: String,
-    val posterUrl: String?,
-    val id: Int?
-) {
-    constructor() : this(null, null, "", 0.0f, "", "", 0)
-}
-
-data class UserProfile(
-    val userId: String,
-    val displayName: String?,
-    val email: String?
-) {
-    constructor() : this("","","")
-}
-
 @Parcelize
 data class TVShow(
     @SerializedName("id")
@@ -78,5 +57,22 @@ data class TVShow(
     constructor() : this(null,"","","","","","")
 }
 
+data class WatchlistItem(
+    var key: String?, // Field to store the Firebase-generated key
+    var userId: String?,
+    val movieTitle: String,
+    val userRating: Float,
+    val userReview: String,
+    val posterUrl: String?,
+    val id: Int?
+) {
+    constructor() : this(null, null, "", 0.0f, "", "", 0)
+}
 
-
+data class UserProfile(
+    val userId: String,
+    val displayName: String?,
+    val email: String?
+) {
+    constructor() : this("","","")
+}

@@ -18,8 +18,6 @@ class MovieAdapter(
 
         // Bind movie data to the ViewHolder
         fun bindMovie(movie: Movie) {
-            binding.movieTitle.text = movie.title
-            binding.movieRating.text = movie.vote
             // Load movie poster image using Glide library
             Glide.with(binding.root).load(IMAGE_BASE + movie.poster).into(binding.moviePoster)
         }

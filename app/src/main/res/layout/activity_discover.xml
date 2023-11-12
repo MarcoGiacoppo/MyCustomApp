@@ -4,10 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_background"
+    android:background="@color/black"
+    android:paddingTop="40dp"
     tools:context=".DiscoverActivity">
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -37,9 +39,9 @@
                         android:id="@+id/searchContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="56dp"
-                        android:layout_marginTop="22dp"
-                        android:layout_marginEnd="24dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
                         android:clickable="true"
                         android:focusable="true"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -52,24 +54,8 @@
                             android:layout_height="35dp"
                             android:background="@drawable/rounded_search"
                             android:theme="@style/CustomSearchView"
-                            app:queryHint="Movies, shows, and more...">
-
-                        </androidx.appcompat.widget.SearchView>
+                            app:queryHint="Movies, shows, and more..."></androidx.appcompat.widget.SearchView>
                     </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/back"
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
-                        android:layout_marginStart="16dp"
-                        android:background="@drawable/bg_circle_dark"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_round_arrow_back_24"
-                        app:layout_constraintBottom_toBottomOf="@+id/searchContainer"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/searchContainer"
-                        app:tint="@color/white" />
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -84,9 +70,9 @@
                         android:layout_marginTop="8dp"
                         android:fontFamily="@font/text"
                         android:text="Recommendation"
-                        android:visibility="visible"
-                        android:textColor="#ffc107"
+                        android:textColor="@color/white"
                         android:textSize="21sp"
+                        android:visibility="visible"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -127,10 +113,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:fontFamily="@font/text"
-                        android:visibility="visible"
                         android:text="Playing Now"
-                        android:textColor="#ffc107"
+                        android:textColor="@color/white"
                         android:textSize="21sp"
+                        android:visibility="visible"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -172,10 +158,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:fontFamily="@font/text"
-                        android:visibility="visible"
                         android:text="Upcoming"
-                        android:textColor="#ffc107"
+                        android:textColor="@color/white"
                         android:textSize="21sp"
+                        android:visibility="visible"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -213,10 +199,99 @@
             android:id="@+id/searchResultsRV"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="90dp"
+            android:layout_marginTop="70dp"
+            android:layout_marginBottom="85dp"
             android:visibility="visible" />
 
     </FrameLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:layout_constraintBottom_toBottomOf="@+id/frameLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:background="@color/nav"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/homeImage2"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    app:srcCompat="@drawable/baseline_home_24"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Home"
+                    android:textAlignment="center"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/discoverImage2"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    app:srcCompat="@drawable/baseline_search_24"
+                    app:tint="@color/red" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Explore"
+                    android:textAlignment="center"
+                    android:textColor="@color/red" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/listImage2"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    app:srcCompat="@drawable/outline_format_list_bulleted_24"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="List"
+                    android:textAlignment="center"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

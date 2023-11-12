@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.mycustomapp.databinding.MovieItemBinding
 import com.example.mycustomapp.models.TVShow
-import com.example.mycustomapp.databinding.TvShowItemBinding
 
 class TVShowAdapter(
     private val tvShows: List<TVShow>,
@@ -13,15 +13,13 @@ class TVShowAdapter(
 ) : RecyclerView.Adapter<TVShowAdapter.TVShowViewHolder>() {
 
     // ViewHolder class for individual TV show items
-    class TVShowViewHolder(private val binding: TvShowItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class TVShowViewHolder(private val binding: MovieItemBinding) : RecyclerView.ViewHolder(binding.root) {
         private val IMAGE_BASE = "https://image.tmdb.org/t/p/w500/"
 
         // Bind TV show data to the ViewHolder
         fun bindTVShow(tvShow: TVShow) {
-            binding.tvshowName.text = tvShow.name
-            binding.tvshowRating.text = tvShow.vote.toString() // You may need to adjust this based on your TVShow class
             // Load TV show poster image using Glide library
-            Glide.with(binding.root).load(IMAGE_BASE + tvShow.poster).into(binding.tvshowPoster)
+            Glide.with(binding.root).load(IMAGE_BASE + tvShow.poster).into(binding.moviePoster)
         }
     }
 
@@ -32,7 +30,7 @@ class TVShowAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TVShowViewHolder {
         // Inflate the layout for an individual TV show item
-        val binding = TvShowItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = MovieItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TVShowViewHolder(binding)
     }
 

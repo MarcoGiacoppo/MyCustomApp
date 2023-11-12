@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
 
         popularMoviesTextView.setOnClickListener {
             saveUserChoice("Popular Movies")
-            popularMoviesTextView.setTextColor(resources.getColor(R.color.yellow))
+            popularMoviesTextView.setTextColor(resources.getColor(R.color.white))
             topRatedMoviesTextView.setTextColor(resources.getColor(R.color.greyText))
             topRatedMoviesTextView.isEnabled = true
             popularMoviesTextView.isEnabled = false
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
 
         topRatedMoviesTextView.setOnClickListener {
             saveUserChoice("Top Rated Movies")
-            topRatedMoviesTextView.setTextColor(resources.getColor(R.color.yellow))
+            topRatedMoviesTextView.setTextColor(resources.getColor(R.color.white))
             popularMoviesTextView.setTextColor(resources.getColor(R.color.greyText))
             popularMoviesTextView.isEnabled = true
             topRatedMoviesTextView.isEnabled = false
@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
 
         popularTvTextView.setOnClickListener {
             saveUserChoiceTV("Popular TV Show")
-            popularTvTextView.setTextColor(resources.getColor(R.color.yellow))
+            popularTvTextView.setTextColor(resources.getColor(R.color.white))
             topRatedTvTextView.setTextColor(resources.getColor(R.color.greyText))
             topRatedTvTextView.isEnabled = true
             popularTvTextView.isEnabled = false
@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
 
         topRatedTvTextView.setOnClickListener {
             saveUserChoiceTV("Top Rated TV Show")
-            topRatedTvTextView.setTextColor(resources.getColor(R.color.yellow))
+            topRatedTvTextView.setTextColor(resources.getColor(R.color.white))
             popularTvTextView.setTextColor(resources.getColor(R.color.greyText))
             popularTvTextView.isEnabled = true
             topRatedTvTextView.isEnabled = false
@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
 
         // Navbar
         val homeButton = findViewById<ImageView>(R.id.homeImage)
-        val movieButton = findViewById<ImageView>(R.id.moviesImage)
+        val movieButton = findViewById<ImageView>(R.id.discoverImage)
         val listButtons = findViewById<ImageView>(R.id.listImage)
 
         homeButton.setOnClickListener {
@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, TVSh
 
     override fun onItemClick(tvShow: TVShow) {
         val intent = Intent(this, DetailActivity::class.java)
-        intent.putExtra("tvshow", tvShow)
+        intent.putExtra("tvShow", tvShow)
         intent.putExtra("tv_id", tvShow.id)
         startActivity(intent)
     }

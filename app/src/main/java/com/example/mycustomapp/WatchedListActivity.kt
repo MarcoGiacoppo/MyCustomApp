@@ -65,9 +65,9 @@ class WatchedListActivity : AppCompatActivity(),
         }
 
         // Navbar
-        val homeButton = findViewById<ImageView>(R.id.homeImage2)
-        val movieButton = findViewById<ImageView>(R.id.moviesImage2)
-        val listButtons = findViewById<ImageView>(R.id.listImage2)
+        val homeButton = findViewById<ImageView>(R.id.homeImage3)
+        val movieButton = findViewById<ImageView>(R.id.discoverImage3)
+        val listButtons = findViewById<ImageView>(R.id.listImage3)
 
         homeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)

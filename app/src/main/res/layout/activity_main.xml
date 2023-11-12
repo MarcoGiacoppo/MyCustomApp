@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_background"
+    android:background="@color/black"
     android:paddingTop="40dp"
     tools:context=".MainActivity">
 
@@ -13,7 +13,7 @@
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/gradient_color_background"
+        android:background="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/title"
-                    android:shadowColor="#FF0000"
+                    android:shadowColor="@color/red"
                     android:shadowDx="5"
                     android:shadowDy="5"
                     android:shadowRadius="10"
@@ -58,15 +58,26 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:id="@+id/profileBtn"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
+                    app:cardCornerRadius="50dp"
                     app:layout_constraintBottom_toBottomOf="@+id/mainTitle"
-                    app:layout_constraintEnd_toEndOf="@+id/mainTitle"
-                    app:layout_constraintTop_toTopOf="@+id/mainTitle"
-                    app:srcCompat="@drawable/baseline_person_24" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/mainTitle">
+
+                    <ImageView
+                        android:id="@+id/profileBtn"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/mainTitle"
+                        app:layout_constraintEnd_toEndOf="@+id/mainTitle"
+                        app:layout_constraintTop_toTopOf="@+id/mainTitle"
+                        app:srcCompat="@drawable/baseline_person_24" />
+                </androidx.cardview.widget.CardView>
+
 
                 <ViewFlipper
                     android:id="@+id/viewFlipper"
@@ -148,7 +159,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="5dp">
 
                 <ProgressBar
@@ -214,7 +225,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="320dp"
+                android:layout_height="225dp"
                 android:layout_marginTop="5dp">
 
                 <ProgressBar
@@ -223,7 +234,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/rv_tvshow"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/rv_tvshow"
                     app:layout_constraintStart_toStartOf="@+id/rv_tvshow"
                     app:layout_constraintTop_toTopOf="parent"
@@ -232,8 +243,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_tvshow"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:layout_marginBottom="100dp"
+                    android:layout_height="0dp"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -290,7 +300,7 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/moviesImage"
+                    android:id="@+id/discoverImage"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_gravity="center"

@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,25 +47,15 @@ class DiscoverActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, 
     private lateinit var recommendationTextView: TextView
     private lateinit var playingNowTextView: TextView
     private lateinit var upcomingMovieTextView: TextView
+    private lateinit var searchView: SearchView
     private lateinit var job: Job
-
-    private val searchResultsList = mutableListOf<Movie>()
-    private val searchResultsAdapter = SearchResultsAdapter(searchResultsList, object : SearchResultsAdapter.OnItemClickListener {
-        override fun onItemClick(movie: Movie) {
-            // Handle item click (if needed)
-            val intent = Intent(this@DiscoverActivity, DetailActivity::class.java)
-            intent.putExtra("movie", movie)
-            intent.putExtra("movie_id", movie.id)
-            intent.putExtra("source", "recommendation")
-            startActivity(intent)
-        }
-    })
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_discover)
 
         recommendationTextView = findViewById(R.id.recommendationTextView)
@@ -80,21 +71,27 @@ class DiscoverActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, 
         upcomingRecyclerView = findViewById(R.id.upcomingRV)
         upcomingRecyclerView.layoutManager = LinearLayoutManager(this@DiscoverActivity, LinearLayoutManager.HORIZONTAL, false)
 
+        searchView = findViewById(R.id.searchView)
+        // Retrieve the search query from intent
+        searchQuery = intent.getStringExtra("search_query")
+
+        if (searchQuery != null) {
+            performMovieSearch(searchQuery!!)
+        }
+
         job = Job()
 
-        val backBtn = findViewById<ImageView>(R.id.back)
-        backBtn.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
         // Fetch and populate recommended movies
         fetchRecommendedMovies()
-
         // Fetch and populate Top Rated movies
         fetchPlayingNowMovies()
-
         // Fetch and populate Upcoming movies
         fetchUpcomingMovies()
+
+        val searchQuery = intent.getStringExtra("search_query")
+        if (searchQuery != null) {
+            performMovieSearch(searchQuery)
+        }
 
         // Search bar
         val searchContainer = findViewById<LinearLayout>(R.id.searchContainer)
@@ -112,16 +109,50 @@ class DiscoverActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, 
                     searchView.clearFocus()
 
                     // Perform the movie search
+                    this@DiscoverActivity.searchQuery = query
                     performMovieSearch(query)
                 }
                 return true
             }
-
             override fun onQueryTextChange(newText: String?): Boolean {
                 return false
             }
         })
+
+        // Navbar
+        val homeButton = findViewById<ImageView>(R.id.homeImage2)
+        val movieButton = findViewById<ImageView>(R.id.discoverImage2)
+        val listButtons = findViewById<ImageView>(R.id.listImage2)
+
+        homeButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        movieButton.setOnClickListener {
+            val intent = Intent(this, DiscoverActivity::class.java)
+            startActivity(intent)
+        }
+
+        listButtons.setOnClickListener {
+            val intent = Intent(this, WatchedListActivity::class.java)
+            startActivity(intent)
+        }
     }
+
+    private var searchQuery: String? = null
+    private val searchResultsList = mutableListOf<Movie>()
+    private val searchResultsAdapter = SearchResultsAdapter(searchResultsList, object : SearchResultsAdapter.OnItemClickListener {
+        override fun onItemClick(movie: Movie) {
+            // Handle item click (if needed)
+            val intent = Intent(this@DiscoverActivity, DetailActivity::class.java)
+            intent.putExtra("movie", movie)
+            intent.putExtra("movie_id", movie.id)
+            intent.putExtra("search_query", searchQuery)
+            intent.putExtra("source", "recommendation")
+            startActivity(intent)
+        }
+    })
 
     private fun performMovieSearch(query: String) {
         val apiKey = "381e5879afdcdcba913bc1f839a6f004"
@@ -189,9 +220,12 @@ class DiscoverActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, 
                         val searchResultsRecyclerView = findViewById<RecyclerView>(R.id.searchResultsRV)
                         searchResultsRecyclerView.layoutManager = GridLayoutManager(this@DiscoverActivity, 3)
                         searchResultsRecyclerView.adapter = searchResultsAdapter
+                        // Clear the list
                         searchResultsList.clear()
                         searchResultsList.addAll(searchResults)
+                        // Update the UI
                         searchResultsAdapter.notifyDataSetChanged()
+                        searchView.setQuery(query, false)
                     }
                 } else {
                     // Handle non-successful response
@@ -245,7 +279,6 @@ class DiscoverActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, 
                         }
                     }
                     if (recommendedMovieIds.isEmpty()) {
-                        progressBar.visibility = View.VISIBLE
                         // Show a Toast message if there are no 5-star ratings
                         Toast.makeText(
                             this@DiscoverActivity,
@@ -273,62 +306,61 @@ class DiscoverActivity : AppCompatActivity(), MovieAdapter.OnItemClickListener, 
         }
     }
     private suspend fun fetchRecommendations(movieIds: List<Int>, apiKey: String): List<Movie> {
-            val retrofit = Retrofit.Builder()
-                .baseUrl("https://api.themoviedb.org/3/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.themoviedb.org/3/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-            val apiService = retrofit.create(RecommendationMovie::class.java)
+        val apiService = retrofit.create(RecommendationMovie::class.java)
 
-            // Initialize an empty list to store recommended movies
-            val recommendedMovies = mutableListOf<Movie>()
+        // Initialize an empty list to store recommended movies
+        val recommendedMovies = mutableListOf<Movie>()
 
-            for (movieId in movieIds) {
-                val recommendedMoviesResponse = withContext(Dispatchers.IO) {
-                    apiService.getMovies(movieId , apiKey).execute()
-                }
-
-                if (recommendedMoviesResponse.isSuccessful) {
-                    recommendedMovies.addAll(recommendedMoviesResponse.body()?.movies ?: emptyList())
-
-                }
+        for (movieId in movieIds) {
+            val recommendedMoviesResponse = withContext(Dispatchers.IO) {
+                apiService.getMovies(movieId , apiKey).execute()
             }
-            return recommendedMovies
+
+            if (recommendedMoviesResponse.isSuccessful) {
+                recommendedMovies.addAll(recommendedMoviesResponse.body()?.movies ?: emptyList())
+            }
         }
+        return recommendedMovies
+    }
 
     private fun fetchPlayingNowMovies() {
-            val apiKey = "381e5879afdcdcba913bc1f839a6f004"
-            val progressBar = findViewById<ProgressBar>(R.id.progressPlayingNow)
+        val apiKey = "381e5879afdcdcba913bc1f839a6f004"
+        val progressBar = findViewById<ProgressBar>(R.id.progressPlayingNow)
 
-            launch {
-                progressBar.visibility = View.VISIBLE
-                val nowPlayingMovies = fetchPlayingNowMovies(apiKey)
+        launch {
+            progressBar.visibility = View.VISIBLE
+            val nowPlayingMovies = fetchPlayingNowMovies(apiKey)
 
-                if (nowPlayingMovies.isNotEmpty()) {
-                    playingNowRecyclerView.adapter =
-                        MovieAdapter(nowPlayingMovies, this@DiscoverActivity)
-                    progressBar.visibility = View.GONE
-                }
+            if (nowPlayingMovies.isNotEmpty()) {
+                playingNowRecyclerView.adapter =
+                    MovieAdapter(nowPlayingMovies, this@DiscoverActivity)
+                progressBar.visibility = View.GONE
             }
         }
+    }
     private suspend fun fetchPlayingNowMovies(apiKey: String): List<Movie> {
-            val retrofit = Retrofit.Builder()
-                .baseUrl("https://api.themoviedb.org/3/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.themoviedb.org/3/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-            val apiService = retrofit.create(PlayingNowMovies::class.java)
+        val apiService = retrofit.create(PlayingNowMovies::class.java)
 
-            val playingNowMoviesResponse = withContext(Dispatchers.IO) {
-                apiService.getNowPlayingMovies(apiKey).execute()
-            }
-
-            return if (playingNowMoviesResponse.isSuccessful) {
-                playingNowMoviesResponse.body()?.movies ?: emptyList()
-            } else {
-                emptyList()
-            }
+        val playingNowMoviesResponse = withContext(Dispatchers.IO) {
+            apiService.getNowPlayingMovies(apiKey).execute()
         }
+
+        return if (playingNowMoviesResponse.isSuccessful) {
+            playingNowMoviesResponse.body()?.movies ?: emptyList()
+        } else {
+            emptyList()
+        }
+    }
 
     private fun fetchUpcomingMovies() {
         val apiKey = "381e5879afdcdcba913bc1f839a6f004"
